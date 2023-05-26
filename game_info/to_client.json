@@ -1,1 +1,1 @@
-{"stop": true, "agents": [{"name": "Frank", "status": null, "destination": [10, 10, 10], "conversation": null}, {"name": "Bob", "status": null, "destination": [10, 10, 10], "conversation": null}, {"name": "Alice", "status": null, "destination": [10, 10, 10], "conversation": null}]}
+{"stop": true, "agents": [{"name": "Frank", "status": null, "destination": null, "conversation": null}, {"name": "Bob", "status": null, "destination": null, "conversation": null}, {"name": "Alice", "status": null, "destination": null, "conversation": null}]}
