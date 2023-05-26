@@ -39,7 +39,7 @@ class Game:
     def update_agent(self, agent):
         # Percieve the world around them
         for place in self.places:
-            if agent.is_within_range(place.x, place.y):
+            if agent.is_within_range(place.x, place.y, place.z):
                 # Make an observation for that thing
                 memory = Memory(self.time, place.description())
                 agent.memory_stream.append(memory)
@@ -59,7 +59,6 @@ class Game:
         for i, agent in enumerate(self.agents):
             data['agents'].append({})
             data['agents'][i]['name'] = agent.name
-            data['agents'][i]['position'] = [agent.x, agent.y]
             data['agents'][i]['status'] = agent.status
             data['agents'][i]['destination'] = agent.destination
             data['agents'][i]['conversation'] = agent.conversation
