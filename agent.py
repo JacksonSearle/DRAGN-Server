@@ -10,6 +10,7 @@ class Agent:
         self.vision_radius = character_sheet['vision_radius']
         self.destination = None
         self.status = None
+        self.conversation = None
 
     def is_within_range(self, x2, y2):
         x1, y1 = self.x, self.y

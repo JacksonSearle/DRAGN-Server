@@ -7,19 +7,19 @@ if __name__ == "__main__":
     game_states = 100
     time_step = 1 # seconds
     game = Game(time_step=time_step)
-    # Give original json to client
-    # Reading a JSON file
-    with open('agent_info.json', 'r') as file:
-        data = json.load(file)
-        c_agents = data['agents']
+    # # Give original json to client
 
-    # Update the client agents' status
-    data['stop'] = False
-    for c_agent, s_agent in zip(c_agents, game.agents):
-        c_agent['name'] = s_agent.name
-        c_agent['position'] = [s_agent.x, s_agent.y]
-        c_agent['destination'] = s_agent.destination
-        c_agent['status'] = s_agent.status
+    # # Reading a JSON file
+    # with open('agent_info.json', 'r') as file:
+    #     data = json.load(file)
+    #     c_agents = data['agents']
+
+    # # Update the client agents' status
+    # data['stop'] = False
+    # game.update(data)
+
+    #TODO: Get initial JSON from server
+    data = game.initial_json()
 
     # Writing initial data to a JSON file
     with open('agent_info.json', 'w') as file:
@@ -44,9 +44,8 @@ if __name__ == "__main__":
             data['stop'] = True
             
 
-        # Update the client agents' status
-        for c_agent, s_agent in zip(c_agents, game.agents):
-            c_agent['status'] = s_agent.status
+        # Update our computed info
+        game.update(data)
 
         # Writing to a JSON file
         with open('agent_info.json', 'w') as file:
