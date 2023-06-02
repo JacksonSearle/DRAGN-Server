@@ -1,1 +1,1 @@
-{"agents": [{"name": "Frank", "position": [10, 10, 10]}, {"name": "Bob", "position": [10, 10, 10]}, {"name": "Alice", "position": [10, 10, 10]}]}
+{"agents": [{"name": "Frank", "position": {"x": 44, "y": 10, "z": 10}}, {"name": "Bob", "position": {"x": 10, "y": 10, "z": 10}}, {"name": "Alice", "position": {"x": 10, "y": 10, "z": 10}}]}

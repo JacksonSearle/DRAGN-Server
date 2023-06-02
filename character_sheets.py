@@ -1,19 +1,19 @@
 character_sheets = [
     {
         'name': 'Frank',
-        'position': [0, 9, 0],
+        'position': {"x": 0, "y": 9, "z": 0},
         'vision_radius': 3,
         'description': 'enjoys reading books; is a vegetarian;'
     },
     {
         'name': 'Bob',
-        'position': [9, 9, 0],
+        'position': {"x": 9, "y": 9, "z": 0},
         'vision_radius': 3,
         'description': 'enjoys going fishing; reads the news a lot; enjoys investing in stocks; married to Alice'
     },
     {
         'name': 'Alice',
-        'position': [8, 9, 0],
+        'position': {"x": 8, "y": 9, "z": 0},
         'vision_radius': 3,
         'description': 'loves to go swimming; likes to cook new foods; '
     }

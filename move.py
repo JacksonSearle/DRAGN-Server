@@ -39,10 +39,10 @@ def update():
 
     # Modifying data
     for s_agent, c_agent in zip(s_data['agents'], c_data['agents']):
-        dest_x, dest_y, dest_z = s_agent['destination']
-        x, y, z = c_agent['position']
+        dest_x, dest_y, dest_z = s_agent['destination']['x'], s_agent['destination']['y'], s_agent['destination']['z']
+        x, y, z = c_agent['position']['x'], c_agent['position']['y'], c_agent['position']['z']
         x, y, z = pathfinding(dest_x, dest_y, dest_z, x, y, z)
-        c_agent['position'] = [x, y, z]
+        c_agent['position'] = {"x": x, "y": y, "z": z}
 
     # Writing to a JSON file
     with open('game_info/to_server.json', 'w') as file:
@@ -54,7 +54,7 @@ while(True):
     update()
 
 # Example to_server in case you write over it
-# {"agents": [{"name": "Frank", "position": [0, 1, 1]}, {"name": "Bob", "position": [0, 0, 1]}, {"name": "Alice", "position": [0, 0, 0]}]}
+# {"agents": [{"name": "Frank", "position": {"x": 44, "y": 10, "z": 10}}, {"name": "Bob", "position": {"x": 10, "y": 10, "z": 10}}, {"name": "Alice", "position": {"x": 10, "y": 10, "z": 10}}]}
 
 # Example to_client in case you don't have destinations or write over it
-# {"stop": true, "agents": [{"name": "Frank", "status": null, "destination": [10, 10, 10], "conversation": null}, {"name": "Bob", "status": null, "destination": [10, 10, 10], "conversation": null}, {"name": "Alice", "status": null, "destination": [10, 10, 10], "conversation": null}]}
+# {"stop": true, "agents": [{"name": "Frank", "status": null, "destination": {"x": 100, "y": 10, "z": 10}, "conversation": null}, {"name": "Bob", "status": null, "destination": {"x": 10, "y": 10, "z": 10}, "conversation": null}, {"name": "Alice", "status": null, "destination": {"x": 10, "y": 10, "z": 10}, "conversation": null}]}

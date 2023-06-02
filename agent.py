@@ -7,7 +7,7 @@ class Agent:
     def __init__(self, character_sheet):
         self.memory_stream = []
         self.name = character_sheet['name']
-        self.x, self.y, self.z = character_sheet['position']
+        self.x, self.y, self.z = character_sheet['position']['x'], character_sheet['position']['y'], character_sheet['position']['z']
         self.description = character_sheet['description']
         self.vision_radius = character_sheet['vision_radius']
         self.destination = None
