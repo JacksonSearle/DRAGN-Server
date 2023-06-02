@@ -2,6 +2,8 @@ import math
 import numpy as np
 from numpy.linalg import norm
 from util import *
+from sentence_embed import embed
+from time import mktime
 
 class Agent:
     def __init__(self, character_sheet):
@@ -27,17 +29,20 @@ class Agent:
         arec = 1
         aimp = 1
         arel = 1
+        k = 3
         for m in self.memory_stream:
             decay = 0.99
-            recency = (1-decay)**(time.hour-m.last_access.hour)
+            recency = (1-decay)**((mktime(time)-mktime(m.last_access))/3600)
             
             importance = 1#get ChatGPT to rate the memory's description with a prompt like this:
             #"On the scale of 1 to 10, where 1 is purely mundane (e.g., brushing teeth, making bed) and 10 is extremely poignant (e.g., a break up, college acceptance), rate the likely poignancy of the following piece of memory.\nMemory: "+m.description+"\nRating: <fill in>"
             
-            emb = [1,1] #embedding(m.description), using the language model. 'query' passed into this function is an embedding vector already
-            relevance = np.dot(emb,query)/(norm(emb)*norm(query))
+            emb, que = embed([m.description,query])
+            relevance = np.dot(emb,que)/(norm(emb)*norm(que))
             score.append(arec*recency + aimp*importance + arel*relevance)
-        k = 3
-        retrieve = sorted(range(len(score)), key = lambda i: score[i])[-k:]
-        for m in self.memory_stream[retrieve]: m.last_access = time
-        return self.memory_stream[retrieve]
+        retrieve = []
+        idx = sorted(range(len(score)), key = lambda i: score[i])[-k:]
+        for i in idx: 
+            self.memory_stream[i].last_access = time
+            retrieve.append(self.memory_stream[i])
+        return retrieve
