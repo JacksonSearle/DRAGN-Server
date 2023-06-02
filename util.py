@@ -12,3 +12,8 @@ def increase_time(curr_time, minutes):
 def set_start_time(year, month, day, hour, minute, second):
     start_time = time.struct_time((year, month, day, hour, minute, second, -1, -1, -1))
     return start_time
+
+def time_prompt(curr_time):
+    formatted_time = "It is " + time.strftime("%B %d, %Y, %I:%M %p.", curr_time)
+    return formatted_time
+
