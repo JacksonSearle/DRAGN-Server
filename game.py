@@ -37,14 +37,39 @@ class Game:
 
 
     def update_agent(self, agent):
-        # Percieve the world around them
+        # Percieve the objects around them
         for place in self.places:
             if agent.is_within_range(place.x, place.y, place.z):
                 # Make an observation for that thing
-                memory = Memory(self.time, place.description())
+                memory = Memory(self.time, place.state())
                 agent.memory_stream.append(memory)
                 # Choose whether or not to react to each observation
-                # if agent.react(memory):
+                react, interact = agent.react(self.time, memory)
+                if react:
+                    agent.regenerate_plan()
+                    agent.status = interact
+
+        # Percieve the people around them
+        for i, agent in enumerate(self.agents):
+            for j, other_agent in enumerate(self.agents):
+                # Make sure an agent isn't talking to themselves
+                if i != j and agent.is_within_range(other_agent.x, other_agent.y, other_agent.z):
+                    # Make both agents see eachother
+                    description = f'{other_agent.name} is {other_agent.status}'
+                    memory = Memory(self.time, description)
+                    agent.memory_stream.append(memory)
+                    
+                    # Choose whether or not to react to each observation
+                    react, interact = agent.react(self.time, memory)
+                    if react:
+                        # make a memory for the person they are talking to
+                        description = f'{agent.name} is {agent.status}'
+                        memory = Memory(self.time, description)
+                        other_agent.memory_stream.append(memory)
+                        # generate dialogue
+                        self.conversation(agent, other_agent)
+                        agent.regenerate_plan()
+                        other_agent.regenerate_plan()
     
     def update(self, data):
         for i, agent in enumerate(self.agents):
@@ -63,3 +88,6 @@ class Game:
             data['agents'][i]['destination'] = agent.destination
             data['agents'][i]['conversation'] = agent.conversation
         return data
+
+    def conversation(self, agent, other_agent):
+        pass
