@@ -6,20 +6,29 @@ from numpy.linalg import norm
 from util import *
 from sentence_embed import embed
 from time import mktime
+from memory import Memory
 
 class Agent:
-    def __init__(self, character_sheet):
+    def __init__(self, character_sheet, time):
         self.memory_stream = []
         self.name = character_sheet['name']
         self.age = character_sheet['age']
         self.x, self.y, self.z = character_sheet['position']['x'], character_sheet['position']['y'], character_sheet['position']['z']
         self.innate_traits = character_sheet['innate_traits']
         self.seed_memories = character_sheet['seed_memories']
+        self.prep_seeds(time)
         self.vision_radius = character_sheet['vision_radius']
         self.destination = None
         self.status = None
         self.conversation = None
         self.summary_description = None
+
+    def prep_seeds(self, time):
+        seeds = self.seed_memories.split(';')
+        for seed in seeds:
+            memory = Memory(time, seed)
+            self.memory_stream.append(memory)
+
 
     def is_within_range(self, x2, y2, z2):
         x1, y1, z1 = self.x, self.y, self.z

@@ -1,3 +1,4 @@
+import re
 from model import model
 
 class Memory:
@@ -9,14 +10,27 @@ class Memory:
 
     def generate_importance(self):
         # prompt chatgpt
-        prompt = "On the scale of 1 to 10, where 1 is purely mundane (e.g., brushing teeth, making bed) and 10 is extremely poignant (e.g., a break up, college acceptance), rate the likely poignancy of the following piece of memory.\n Memory: {self.description}\n Rating: <fill in>"
+        prompt = f'On the scale of 1 to 10, where 1 is purely mundane (e.g., brushing teeth, making bed) and 10 is extremely poignant (e.g., a break up, college acceptance), rate the likely poignancy of the following piece of memory. Give no explanation. Only print the number. Memory: {self.description}'
         messages = [
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": prompt}
         ]
         output = model(messages)
-        number = output.split()[1]
+        start, end = find_integer_in_string(output)
+        number = int(output[start:end+1])
+        if number > 10:
+            number = 10
+        if number < 1:
+            number = 1
 
-        return int(number)
+        return number
+
+def find_integer_in_string(input_string):
+    match = re.search(r'\d+', input_string)  # searches for the first contiguous integer
+    if match is not None:  # if a match is found
+        return (match.start(), match.end()-1)  # returns the starting and ending indices
+    else:
+        return None  # returns None if no integer is found
+
 
     
