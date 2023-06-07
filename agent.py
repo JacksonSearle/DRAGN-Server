@@ -14,7 +14,7 @@ class Agent:
         self.age = character_sheet['age']
         self.x, self.y, self.z = character_sheet['position']['x'], character_sheet['position']['y'], character_sheet['position']['z']
         self.innate_traits = character_sheet['innate_traits']
-        self.description = character_sheet['description']
+        self.seed_memories = character_sheet['seed_memories']
         self.vision_radius = character_sheet['vision_radius']
         self.destination = None
         self.status = None
