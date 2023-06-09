@@ -41,7 +41,7 @@ class Game:
         for place in self.places:
             if agent.is_within_range(place.x, place.y, place.z):
                 # Make an observation for that thing
-                memory = Memory(self.time, place.state())
+                memory = Memory(self.time, place.state)
                 agent.memory_stream.append(memory)
                 # Choose whether or not to react to each observation
                 react, interact = agent.react(self.time, memory)

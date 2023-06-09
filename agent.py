@@ -29,19 +29,22 @@ class Agent:
     def prompt(self):
         return self.summary_description +'\n'+ format_time(self.time) +'\n'+ self.status +'\n'+ self.memory_stream[-1].description() +'\n'+ self.revelant_context_summary
     
-    def retrieve_memories(self,time,query):
+    def query_model(self,prompt):
+        messages = [
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": prompt}
+        ]
+        return model(messages)
+
+    def retrieve_memories(self,time,query,k=4):
         score = []
         arec = 1
         aimp = 1
         arel = 1
-        k = 3
         for m in self.memory_stream:
             decay = 0.99
-            recency = (1-decay)**((mktime(time)-mktime(m.last_access))/3600)
-            
-            importance = m.importance#get ChatGPT to rate the memory's description with a prompt like this:
-            #"On the scale of 1 to 10, where 1 is purely mundane (e.g., brushing teeth, making bed) and 10 is extremely poignant (e.g., a break up, college acceptance), rate the likely poignancy of the following piece of memory.\nMemory: "+m.description+"\nRating: <fill in>"
-            
+            recency = (1-decay)**min(0,((mktime(time)-mktime(m.last_access))/3600))
+            importance = m.importance
             emb, que = embed([m.description,query])
             relevance = np.dot(emb,que)/(norm(emb)*norm(que))
             score.append(arec*recency + aimp*importance + arel*relevance)
@@ -52,7 +55,37 @@ class Agent:
             retrieve.append(self.memory_stream[i])
         return retrieve
     
-    def update_summary_description(self):
+    
+    def summarize_day(self,time):
+        return self.summary_description_prompt(time, 'day', 7)
+
+    def plan(self,time):
+        query = f'What does {self.name} plan to do today, given the following summary of what he did yesterday?'
+        prompt = '\n'.join(self.summary_description + query + self.summarize_day(set_start_time(time.tm_year,time.tm_month,time.tm_mday-1,0,0,0)))
+        response_text = self.query_model(prompt)
+        self.plan_hour(time,response_text)
+        return
+    
+    def plan_hour(self,time,dayplan,lastplan='I am sleeping.'):
+        dayplan = '{self.name}\'s daily plan: ' + dayplan
+        lastplan = '{self.name}\'s plan for the last hour: ' + lastplan
+        query = f'Given the context above, what does {self.name} plan to do this hour?'
+        prompt = '\n'.join(dayplan + lastplan + query)
+        response_text = self.query_model(prompt)
+        self.plan_next(time,response_text)
+        return
+
+    def plan_next(self,time,hourplan):
+        hourplan = '{self.name}\'s plan this hour: ' + hourplan
+        query = f'Given the context above, what does {self.name} plan to do right now, and for how long? Give your answer as a json dictionary object with "plan": string and "duration": int, and make the duration either 5, 10, or 15 minutes.'
+        prompt = '\n'.join(time_prompt(time) + hourplan + query)
+        response_text = self.query_model(prompt)
+        # TODO: Ensure it's a json or reprompt
+        dictionary = json.loads(response_text)
+        return dictionary['plan'], dictionary['duration']
+
+    
+    def update_summary_description(self,time):
         # Name
         name = f'Name: {self.name} (age: {self.age})'
 
@@ -74,18 +107,12 @@ class Agent:
                                              daily_occupation, 
                                              recent_progress_in_life)
 
-    def summary_description_prompt(self, time, text):
+    def summary_description_prompt(self, time, text, k=4):
         # Generate prompt
         query = f'How would one describe {self.name}\'s {text} given the following statements?'
-        memories = self.retrieve_memories(time, query)
+        memories = self.retrieve_memories(time, query, k)
         prompt = '\n'.join([query] + [memory.description for memory in memories])
-        
-        # Query model
-        messages = [
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": prompt}
-        ]
-        response_text = model(messages)
+        response_text = self.query_model(prompt)
         return response_text
 
     def format_status(self):
@@ -100,13 +127,7 @@ class Agent:
         relevant_context = '\n'.join([memory.description for memory in memories])
         question = f'Based on the context above, give a json dictionary object with "react": bool and "interact": string. It will decide whether the character should react to the observation, and if they reacted, how they would interact with the object'
         prompt = '\n'.join(self.summary_description, time_prompt(time), self.format_status(), memory.format_description(), relevant_context, question)
-        
-        # Query model
-        messages = [
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": prompt}
-        ]
-        response_text = model(messages)
+        response_text = self.query_model(prompt)
 
         # TODO: Ensure it's a json or reprompt
         
