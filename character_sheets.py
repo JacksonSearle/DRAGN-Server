@@ -5,7 +5,7 @@ character_sheets = [
         'position': {"x": 0, "y": 9, "z": 0},
         'vision_radius': 3,
         'innate_traits': 'friendly, outgoing, hospitable',
-        'description': 'enjoys reading books; is a vegetarian;'
+        'seed_memories': 'enjoys reading books; is a vegetarian'
     },
     {
         'name': 'Bob',
@@ -13,7 +13,7 @@ character_sheets = [
         'position': {"x": 9, "y": 9, "z": 0},
         'vision_radius': 3,
         'innate_traits':'friendly, outgoing, hospitable',
-        'description': 'enjoys going fishing; reads the news a lot; enjoys investing in stocks; married to Alice'
+        'seed_memories': 'enjoys going fishing; reads the news a lot; enjoys investing in stocks; married to Alice'
     },
     {
         'name': 'Alice',
@@ -21,6 +21,6 @@ character_sheets = [
         'position': {"x": 8, "y": 9, "z": 0},
         'vision_radius': 3,
         'innate_traits': 'friendly, outgoing, hospitable',
-        'description': 'loves to go swimming; likes to cook new foods; '
+        'seed_memories': 'loves to go swimming; likes to cook new foods'
     }
 ]

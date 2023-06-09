@@ -16,7 +16,7 @@ class Game:
     def make_agents(self):
         agents = []
         for character_sheet in character_sheets:
-            agents.append(Agent(character_sheet))
+            agents.append(Agent(character_sheet, self.time))
         return agents
 
     def make_agent_info(self):
