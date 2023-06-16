@@ -18,6 +18,8 @@ class Agent:
         self.seed_memories = character_sheet['seed_memories']
         self.prep_seeds(time)
         self.vision_radius = character_sheet['vision_radius']
+        self.dayplan = None
+        self.hourplans = ['Sleeping.']
         self.destination = None
         self.status = None
         self.conversation = None
@@ -70,28 +72,32 @@ class Agent:
 
     def plan(self,time):
         query = f'What does {self.name} plan to do today, given the following summary of what he did yesterday?'
-        prompt = '\n'.join(self.summary_description + query + self.summarize_day(set_start_time(time.tm_year,time.tm_month,time.tm_mday-1,0,0,0)))
+        prompt = '\n'.join([self.summary_description, query, self.summarize_day(set_start_time(time.tm_year,time.tm_month,time.tm_mday-1,0,0,0))])
         response_text = self.query_model(prompt)
-        self.plan_hour(time,response_text)
-        return
+        self.dayplan = response_text
+        return self.plan_hour(time)
+        
     
-    def plan_hour(self,time,dayplan,lastplan='I am sleeping.'):
-        dayplan = '{self.name}\'s daily plan: ' + dayplan
-        lastplan = '{self.name}\'s plan for the last hour: ' + lastplan
+    def plan_hour(self,time):
+        dayplan = '{self.name}\'s daily plan: ' + self.dayplan
+        lastplan = '{self.name}\'s plan for the last hour: ' + self.hourplans[-1]
         query = f'Given the context above, what does {self.name} plan to do this hour?'
-        prompt = '\n'.join(dayplan + lastplan + query)
+        prompt = '\n'.join([dayplan, lastplan, query])
         response_text = self.query_model(prompt)
-        self.plan_next(time,response_text)
-        return
+        self.hourplans.append(response_text)
+        return self.plan_next(time)
+        
 
-    def plan_next(self,time,hourplan):
+    def plan_next(self,time):
         hourplan = '{self.name}\'s plan this hour: ' + hourplan
+        status = '{self.name}\'s status right now: ' + self.status
         query = f'Given the context above, what does {self.name} plan to do right now, and for how long? Give your answer as a json dictionary object with "plan": string and "duration": int, and make the duration either 5, 10, or 15 minutes.'
-        prompt = '\n'.join(time_prompt(time) + hourplan + query)
+        prompt = '\n'.join([time_prompt(time), hourplan, status, query])
         response_text = self.query_model(prompt)
         # TODO: Ensure it's a json or reprompt
         dictionary = json.loads(response_text)
         return dictionary['plan'], dictionary['duration']
+        #returns plan to update_agent() in game, which will then search world tree for best object to do this action
 
     
     def update_summary_description(self,time):
@@ -135,7 +141,7 @@ class Agent:
         memories = self.retrieve_memories(time, memory.description)
         relevant_context = '\n'.join([memory.description for memory in memories])
         question = f'Based on the context above, give a json dictionary object with "react": bool and "interact": string. It will decide whether the character should react to the observation, and if they reacted, how they would interact with the object'
-        prompt = '\n'.join(self.summary_description, time_prompt(time), self.format_status(), memory.format_description(), relevant_context, question)
+        prompt = '\n'.join([self.summary_description, time_prompt(time), self.format_status(), memory.format_description(), relevant_context, question])
         response_text = self.query_model(prompt)
 
         # TODO: Ensure it's a json or reprompt

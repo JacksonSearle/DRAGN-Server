@@ -5,7 +5,7 @@ class Node:
         self.y = y
         self.z = z
         self.path = path
-        self.state = 'idling'
+        self.state = 'idle'
         self.children = []
 
     def add_child(self, node):
