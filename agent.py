@@ -1,6 +1,7 @@
 import math
 import json
 import numpy as np
+import re
 from model import model
 from numpy.linalg import norm
 from util import *
@@ -18,8 +19,10 @@ class Agent:
         self.seed_memories = character_sheet['seed_memories']
         self.prep_seeds(time)
         self.vision_radius = character_sheet['vision_radius']
+        self.waking_hours = character_sheet['waking_hours']
         self.dayplan = None
         self.hourplans = ['Sleeping.']
+        self.yesterday_summary = None
         self.destination = None
         self.status = None
         self.conversation = None
@@ -68,11 +71,11 @@ class Agent:
     
     
     def summarize_day(self,time):
-        return self.summary_description_prompt(time, 'day', 7)
+        return self.summary_description_prompt(time, 'day', 50)
 
-    def plan(self,time):
-        query = f'What does {self.name} plan to do today, given the following summary of what he did yesterday?'
-        prompt = '\n'.join([self.summary_description, query, self.summarize_day(set_start_time(time.tm_year,time.tm_month,time.tm_mday-1,0,0,0))])
+    def plan_day(self,time):
+        query = f'It is {format_time(time)}. What are {self.name}\'s plans today, given the following summary of what he did yesterday?'
+        prompt = '\n'.join([self.summary_description, query, self.yesterday_summary])
         response_text = self.query_model(prompt)
         self.dayplan = response_text
         return self.plan_hour(time)
@@ -97,7 +100,39 @@ class Agent:
         # TODO: Ensure it's a json or reprompt
         dictionary = json.loads(response_text)
         return dictionary['plan'], dictionary['duration']
-        #returns plan to update_agent() in game, which will then search world tree for best object to do this action
+    
+    
+    def reflect(self,time):
+        self.yesterday_summary = self.summarize_day(set_start_time(time.tm_year,time.tm_month,time.tm_mday,0,0,0))
+        for m in self.memory_stream:
+            if m.type == "Observation": self.memory_stream.remove(m)
+
+        relevant_context = '\n'.join([memory.description for memory in self.memory_stream[-100:]])
+        question = f'Given only the information above, what are 3 most salient high-level questions we can answer about the subjects in the statements?'
+        prompt = '\n'.join([relevant_context, question])
+        response_queries = self.query_model(prompt)
+        response_queries = self.find_responses(response_queries,3)
+
+        statements = f"Statements about {self.name}\n"
+        for query in response_queries:
+            memories = self.retrieve_memories(time, query)
+            statements += '\n'.join([memory.description for memory in memories])
+        question = "What 5 high-level insights can you infer from the above statements?"
+        prompt = '\n'.join([statements, question])
+        response_text = self.query_model(prompt)
+        response_text = self.find_responses(response_text,5)
+        for r in response_text: self.memory_stream.append(Memory(time, r, "Reflection"))
+
+    def find_responses(s,i):
+        responses=[]
+        for _ in range(i):
+            match = re.search(r'\d. ', s)
+            if match: s = s[match.end():]
+            match = re.search(r'\?', s)
+            if match: responses.append(s[:match.end()])
+            else: return None
+            s = s[match.end():]
+        return responses
 
     
     def update_summary_description(self,time):

@@ -2,10 +2,11 @@ import re
 from model import model
 
 class Memory:
-    def __init__(self, time, description):
+    def __init__(self, time, description, type="Observation"):
         self.time = time
         self.last_access = time
         self.description = description
+        self.type = type
         self.importance = self.generate_importance()
 
     def generate_importance(self):

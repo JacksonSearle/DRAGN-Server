@@ -73,8 +73,13 @@ class Game:
                     self.conversation(agent, other_agent)
 
         #Plan the next moment
-        #Call day plan if agent is just waking up, call hour plan if on an hour mark, call next plan otherwise
-        agent.plan_next(self.time)
+        #Call day plan if agent is just waking up, call reflection if agent is going to bed, or call hour/minute plans if during waking hours
+        timeofday = get_timeofday(self.time)
+        if timeofday == agent.waking_hours["up"]: agent.plan_day(self.time)
+        elif timeofday == agent.waking_hours["down"]: agent.reflect(self.time)
+        elif agent.waking_hours["up"] < timeofday < agent.waking_hours["down"]:
+            if timeofday%100 == 0: agent.plan_hour(self.time)
+            else: agent.plan_next(self.time)
 
     
     def choose_location(self,agent,root=None):
