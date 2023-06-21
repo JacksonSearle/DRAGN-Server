@@ -4,6 +4,9 @@ def format_time(curr_time):
     formatted_time = time.strftime("%Y-%m-%d %H:%M:%S", curr_time)
     return formatted_time
 
+def get_timeofday(curr_time):
+    return curr_time.tm_hour*100 + curr_time.tm_min
+
 def increase_time(curr_time, minutes):
     seconds = minutes * 60
     new_time = time.mktime(curr_time) + seconds

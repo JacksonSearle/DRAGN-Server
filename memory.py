@@ -1,15 +1,19 @@
 import re
 import config
+from sentence_embed import embed
+
 if config.MODE == 'debugging':
     from debugging_model import model  # Import for debugging mode
 elif config.MODE == 'testing':
     from testing_model import model  # Import for testing mode
 
 class Memory:
-    def __init__(self, time, description):
+    def __init__(self, time, description, type="Observation"):
         self.time = time
         self.last_access = time
         self.description = description
+        self.type = type
+        self.emb = embed(description)
         self.importance = self.generate_importance()
 
     def generate_importance(self):
@@ -38,4 +42,5 @@ def find_integer_in_string(input_string):
         return (match.start(), match.end()-1)  # returns the starting and ending indices
     else:
         return None  # returns None if no integer is found
+
     
