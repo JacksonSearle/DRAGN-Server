@@ -33,12 +33,20 @@ class Agent:
         self.conversation = None
         self.summary_description = None
         self.update_summary_description(time)
+        self.importance_buffer = 0
+
+    def add_memory(self, memory):
+        self.memory_stream.append(memory)
+        self.importance_buffer += memory.importance
+        if self.importance_buffer > 150:
+            self.reflect()
+            self.update_summary_description()
 
     def prep_seeds(self, time):
         seeds = self.seed_memories.split(';')
         for seed in seeds:
             memory = Memory(time, seed)
-            self.memory_stream.append(memory)
+            self.add_memory(memory)
 
 
     def is_within_range(self, x2, y2, z2):
@@ -127,7 +135,7 @@ class Agent:
         prompt = '\n'.join([statements, question])
         response_text = self.query_model(prompt)
         response_text = self.find_responses(response_text,5)
-        for r in response_text: self.memory_stream.append(Memory(time, r, "Reflection"))
+        for r in response_text: self.add_memory(Memory(time, r, "Reflection"))
 
     def find_responses(s,i):
         responses=[]

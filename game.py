@@ -47,7 +47,7 @@ class Game:
             if agent.is_within_range(place.x, place.y, place.z):
                 # Make an observation for that thing
                 memory = Memory(self.time, place.state)
-                agent.memory_stream.append(memory)
+                agent.add_memory(memory)
                 # Choose whether or not to react to each observation
                 react, interact = agent.react(self.time, memory)
                 if react: 
@@ -72,7 +72,7 @@ class Game:
                     # make a memory for the person they are talking to
                     description = f'{agent.name} is {agent.status}'
                     memory = Memory(self.time, description)
-                    other_agent.memory_stream.append(memory)
+                    other_agent.add_memory(memory)
                     other_agent.status = description
                     # generate dialogue
                     self.conversation(agent, other_agent)
@@ -152,8 +152,8 @@ class Game:
         # Put the conversation description into memory stream
         conversation_description = self.create_conversation_description(dialogue_history)
         shared_memory = Memory(self.time, conversation_description)
-        agent.memory_stream.append(shared_memory)
-        other_agent.memory_stream.append(shared_memory)
+        agent.add_memory(shared_memory)
+        other_agent.add_memory(shared_memory)
     
     def create_conversation_description(self, dialogue_history):
         message = f'Generate a one sentence description of the following dialogue history:\n {dialogue_history}'
