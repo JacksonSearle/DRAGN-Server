@@ -55,12 +55,12 @@ class Agent:
         arec = 1
         aimp = 1
         arel = 1
+        query = embed([query])
         for m in self.memory_stream:
             decay = 0.99
             recency = (1-decay)**min(0,((mktime(time)-mktime(m.last_access))/3600))
             importance = m.importance
-            emb, que = embed([m.description,query])
-            relevance = np.dot(emb,que)/(norm(emb)*norm(que))
+            relevance = np.dot(m.emb,query)/(norm(m.emb)*norm(query))
             score.append(arec*recency + aimp*importance + arel*relevance)
         retrieve = []
         idx = sorted(range(len(score)), key = lambda i: score[i])[-k:]

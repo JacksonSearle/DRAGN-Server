@@ -1,4 +1,5 @@
 import re
+from sentence_embed import embed
 from model import model
 
 class Memory:
@@ -7,6 +8,7 @@ class Memory:
         self.last_access = time
         self.description = description
         self.type = type
+        self.emb = embed(description)
         self.importance = self.generate_importance()
 
     def generate_importance(self):
