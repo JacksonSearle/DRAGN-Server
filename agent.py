@@ -37,13 +37,17 @@ class Agent:
         self.conversation = None
         self.summary_description = None
         self.update_summary_description(time)
-        self.importance_buffer = 0
+        self.reflect_buffer = 0
+        self.summary_description_buffer = 0
 
     def add_memory(self, memory):
         self.memory_stream.append(memory)
-        self.importance_buffer += memory.importance
-        if self.importance_buffer > 150:
+        self.reflect_buffer += memory.importance
+        if self.reflect_buffer > 150:
+            self.reflect_buffer = 0
             self.reflect()
+        if self.summary_description_buffer > 40:
+            self.summary_description_buffer = 0
             self.update_summary_description()
 
     def prep_seeds(self, time):
@@ -51,7 +55,6 @@ class Agent:
         for seed in seeds:
             memory = Memory(time, seed)
             self.add_memory(memory)
-
 
     def is_within_range(self, x2, y2, z2):
         x1, y1, z1 = self.x, self.y, self.z
