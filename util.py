@@ -7,13 +7,12 @@ def format_time(curr_time):
 def get_timeofday(curr_time):
     return curr_time.tm_hour*100 + curr_time.tm_min
 
-def increase_time(curr_time, minutes):
-    seconds = minutes * 60
+def increase_time(curr_time, seconds):
     new_time = time.mktime(curr_time) + seconds
     return time.localtime(new_time)
 
 def set_start_time(year, month, day, hour, minute, second):
-    start_time = time.struct_time((year, month, day, hour, minute, second, -1, -1, -1))
+    start_time = time.struct_time((year, month, day, hour, minute, second, 1, 1, 0))
     return start_time
 
 def time_prompt(curr_time):
