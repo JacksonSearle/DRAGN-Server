@@ -89,12 +89,15 @@ class Game:
                     other_agent.status = description
                     # generate dialogue
                     self.conversation(agent, other_agent)
+
     
     def execute_plan(self,agent):
         if agent.object: agent.object.state = "idle"
         agent.object = self.choose_location(agent)
-        #TODO: Prompt model for detailed state of object based on agent's current action on it.
-        agent.object.state = "in use"
+        prompt = f'{agent.name} is {agent.status} at the {agent.object}. Generate a JSON dictionary object with a single field, "state": string, which describes the state the {agent.object} is in.'
+        response_text = self.query_model(prompt)
+        # TODO: Ensure it's a json or reprompt
+        agent.object.state = json.loads(response_text)['state']
         agent.destination = {"x":object.x, "y":object.y, "z":object.z}
     
     def choose_location(self,agent,root=None):
