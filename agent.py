@@ -25,9 +25,9 @@ class Agent:
         self.prep_seeds(time)
         self.vision_radius = character_sheet['vision_radius']
         self.waking_hours = character_sheet['waking_hours']
-        self.dayplan = None
+        self.dayplan = ''
         self.hourplans = ['Sleeping.']
-        self.yesterday_summary = None
+        self.yesterday_summary = ''
         self.destination = None
         self.status = None
         self.conversation = None
@@ -61,7 +61,7 @@ class Agent:
         arec = 1
         aimp = 1
         arel = 1
-        query = embed([query])
+        query = embed(query)
         for m in self.memory_stream:
             decay = 0.99
             recency = (1-decay)**min(0,((mktime(time)-mktime(m.last_access))/3600))
@@ -98,7 +98,7 @@ class Agent:
         
 
     def plan_next(self,time):
-        hourplan = '{self.name}\'s plan this hour: ' + hourplan
+        hourplan = '{self.name}\'s plan this hour: ' + self.hourplans[-1]
         status = '{self.name}\'s status right now: ' + self.status
         query = f'Given the context above, what does {self.name} plan to do right now, and for how long? Give your answer as a json dictionary object with "plan": string and "duration": int, and make the duration either 5, 10, or 15 minutes.'
         prompt = '\n'.join([time_prompt(time), hourplan, status, query])
@@ -179,7 +179,7 @@ class Agent:
         memories = self.retrieve_memories(current_time, memory.description)
         relevant_context = '\n'.join([memory.description for memory in memories])
         question = f'Based on the context above, give a json dictionary object with "react": bool and "interact": string. It will decide whether the character should react to the observation, and if they reacted, how they would interact with the object'
-        prompt = '\n'.join([self.summary_description, time_prompt(time), self.format_status(), memory.format_description(), relevant_context, question])
+        prompt = '\n'.join([self.summary_description, time_prompt(current_time), self.format_status(), memory.format_description(), relevant_context, question])
         response_text = self.query_model(prompt)
 
         # TODO: Ensure it's a json or reprompt
@@ -194,7 +194,7 @@ class Agent:
     
     def respond(self, dialogue_history, other_agent, current_time):
         recent_memory = self.memory_stream[-1]
-        relevant_memories = self.retrieve_memories(current_time, recent_memory)
+        relevant_memories = self.retrieve_memories(current_time, recent_memory.description)
         relevant_memories = f'Here is the dialogue history: {[memory for memory in relevant_memories]}'
         if len(dialogue_history) == 0:
             conditional_context = self.status

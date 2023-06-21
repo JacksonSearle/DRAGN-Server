@@ -13,7 +13,7 @@ elif config.MODE == 'testing':
 class Game:
     def __init__(self, time_step):
         self.time_step = time_step
-        self.time = set_start_time(2023, 5, 24, 6, 0, 0)
+        self.time = set_start_time(2023, 5, 24, 7, 0, 0)
         self.root = build_tree(places)
         self.places = get_all_nodes(self.root) # These are all visitable places
         self.agents = self.make_agents()
