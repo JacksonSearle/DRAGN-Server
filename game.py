@@ -42,7 +42,22 @@ class Game:
             self.update_agent(agent)
 
     def update_agent(self, agent):
-        # Percieve the objects around them
+        self.perceive_objects(agent)
+        self.perceive_agents(agent)
+        #Call day plan if agent is just waking up, call reflection if agent is going to bed, or call hour/minute plans if during waking hours
+        timeofday = get_timeofday(self.time)
+        if timeofday == agent.waking_hours["up"]: 
+            agent.plan_day(self.time)
+            self.execute_plan(agent)
+        elif timeofday == agent.waking_hours["down"]: agent.reflect(self.time)
+        elif agent.waking_hours["up"] < timeofday < agent.waking_hours["down"]:
+            if agent.busy_time <= 0:
+                if timeofday%100 == 0: agent.plan_hour(self.time)
+                else: agent.plan_next(self.time)
+                self.execute_plan(agent)
+            else: agent.busy_time -= self.time_step
+
+    def perceive_objects(self,agent):
         for place in self.places:
             if agent.is_within_range(place.x, place.y, place.z):
                 # Make an observation for that thing
@@ -52,12 +67,9 @@ class Game:
                 react, interact = agent.react(self.time, memory)
                 if react: 
                     agent.status = interact
-                    object = self.choose_location(agent)
-                    #TODO: Prompt model for detailed state of object based on agent's current action on it.
-                    object.state = "in use"
-                    agent.destination = {"x":object.x, "y":object.y, "z":object.z}
-
-        # Percieve the people around them
+                    self.execute_plan(agent)
+    
+    def perceive_agents(self,agent):
         for j, other_agent in enumerate(self.agents):
             # Make sure an agent isn't talking to themselves
             if agent is not other_agent and agent.is_within_range(other_agent.x, other_agent.y, other_agent.z):
@@ -69,6 +81,7 @@ class Game:
                 # Choose whether or not to react to each observation
                 react, interact = agent.react(self.time, memory)
                 if react:
+                    agent.status = interact
                     # make a memory for the person they are talking to
                     description = f'{agent.name} is {agent.status}'
                     memory = Memory(self.time, description)
@@ -76,16 +89,13 @@ class Game:
                     other_agent.status = description
                     # generate dialogue
                     self.conversation(agent, other_agent)
-
-        #Plan the next moment
-        #Call day plan if agent is just waking up, call reflection if agent is going to bed, or call hour/minute plans if during waking hours
-        timeofday = get_timeofday(self.time)
-        if timeofday == agent.waking_hours["up"]: agent.plan_day(self.time)
-        elif timeofday == agent.waking_hours["down"]: agent.reflect(self.time)
-        elif agent.waking_hours["up"] < timeofday < agent.waking_hours["down"]:
-            if timeofday%100 == 0: agent.plan_hour(self.time)
-            else: agent.plan_next(self.time)
-
+    
+    def execute_plan(self,agent):
+        if agent.object: agent.object.state = "idle"
+        agent.object = self.choose_location(agent)
+        #TODO: Prompt model for detailed state of object based on agent's current action on it.
+        agent.object.state = "in use"
+        agent.destination = {"x":object.x, "y":object.y, "z":object.z}
     
     def choose_location(self,agent,root=None):
         if not root: root = self.root

@@ -25,11 +25,15 @@ class Agent:
         self.prep_seeds(time)
         self.vision_radius = character_sheet['vision_radius']
         self.waking_hours = character_sheet['waking_hours']
+
+        self.busy_time = 0
         self.dayplan = ''
         self.hourplans = ['Sleeping.']
         self.yesterday_summary = ''
+
         self.destination = None
         self.status = None
+        self.object = None
         self.conversation = None
         self.summary_description = None
         self.update_summary_description(time)
@@ -84,8 +88,7 @@ class Agent:
         prompt = '\n'.join([self.summary_description, query, self.yesterday_summary])
         response_text = self.query_model(prompt)
         self.dayplan = response_text
-        return self.plan_hour(time)
-        
+        self.plan_hour(time) 
     
     def plan_hour(self,time):
         dayplan = '{self.name}\'s daily plan: ' + self.dayplan
@@ -94,8 +97,7 @@ class Agent:
         prompt = '\n'.join([dayplan, lastplan, query])
         response_text = self.query_model(prompt)
         self.hourplans.append(response_text)
-        return self.plan_next(time)
-        
+        self.plan_next(time)  
 
     def plan_next(self,time):
         hourplan = '{self.name}\'s plan this hour: ' + self.hourplans[-1]
@@ -105,14 +107,16 @@ class Agent:
         response_text = self.query_model(prompt)
         # TODO: Ensure it's a json or reprompt
         dictionary = json.loads(response_text)
-        return dictionary['plan'], dictionary['duration']
+        self.status, self.busy_time = dictionary['plan'], dictionary['duration']*60
     
-    
-    def reflect(self,time):
+    def end_day(self,time):
         self.yesterday_summary = self.summarize_day(set_start_time(time.tm_year,time.tm_month,time.tm_mday,0,0,0))
         for m in self.memory_stream:
             if m.type == "Observation": self.memory_stream.remove(m)
+        self.reflect(time)
+        
 
+    def reflect(self,time):
         relevant_context = '\n'.join([memory.description for memory in self.memory_stream[-100:]])
         question = f'Given only the information above, what are 3 most salient high-level questions we can answer about the subjects in the statements?'
         prompt = '\n'.join([relevant_context, question])
