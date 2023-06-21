@@ -170,9 +170,5 @@ class Game:
     
     def create_conversation_description(self, dialogue_history):
         message = f'Generate a one sentence description of the following dialogue history:\n {dialogue_history}'
-        messages = [
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": message}
-        ]
-        response_text = model(messages)
+        response_text = self.query_model(message)
         return response_text
