@@ -1,12 +1,17 @@
 import math
 import json
 import numpy as np
-from model import model
 from numpy.linalg import norm
 from util import *
 from sentence_embed import embed
 from time import mktime
 from memory import Memory
+import config
+
+if config.MODE == 'debugging':
+    from debugging_model import model  # Import for debugging mode
+elif config.MODE == 'testing':
+    from testing_model import model  # Import for testing mode
 
 class Agent:
     def __init__(self, character_sheet, time):
@@ -22,6 +27,7 @@ class Agent:
         self.status = None
         self.conversation = None
         self.summary_description = None
+        self.update_summary_description(time)
 
     def prep_seeds(self, time):
         seeds = self.seed_memories.split(';')
@@ -61,7 +67,7 @@ class Agent:
             retrieve.append(self.memory_stream[i])
         return retrieve
     
-    def update_summary_description(self):
+    def update_summary_description(self, time):
         # Name
         name = f'Name: {self.name} (age: {self.age})'
 
@@ -77,11 +83,11 @@ class Agent:
         # Feelings about his recent progress in life
         recent_progress_in_life = self.summary_description_prompt(time, 'feelings about his recent progress in life')
 
-        self.summary_description = '\n'.join(name, 
-                                             innate_traits, 
-                                             core_characteristics, 
-                                             daily_occupation, 
-                                             recent_progress_in_life)
+        self.summary_description = '\n'.join([name,
+                                            innate_traits,
+                                            core_characteristics,
+                                            daily_occupation,
+                                            recent_progress_in_life])
 
     def summary_description_prompt(self, time, text):
         # Generate prompt
@@ -100,15 +106,12 @@ class Agent:
     def format_status(self):
         return f'{self.name}\'s status: {self.status}'
     
-    def format_description(self):
-        return f'Observation: {self.name}'
-    
-    def react(self, time, memory):
+    def react(self, current_time, memory):
         # Generate prompt
-        memories = self.retrieve_memories(time, memory.description)
+        memories = self.retrieve_memories(current_time, memory.description)
         relevant_context = '\n'.join([memory.description for memory in memories])
         question = f'Based on the context above, give a json dictionary object with "react": bool and "interact": string. It will decide whether the character should react to the observation, and if they reacted, how they would interact with the object'
-        prompt = '\n'.join(self.summary_description, time_prompt(time), self.format_status(), memory.format_description(), relevant_context, question)
+        prompt = '\n'.join([self.summary_description, time_prompt(current_time), self.format_status(), memory.format_description(), relevant_context, question])
         
         # Query model
         messages = [
@@ -122,4 +125,38 @@ class Agent:
         # Parse output to json
         dictionary = json.loads(response_text)
 
-        return dictionary['react'], dictionary['interact']
+        if dictionary['react']:
+            self.status = dictionary['message']
+
+        return dictionary['react'], dictionary['message']
+    
+    def respond(self, dialogue_history, other_agent, current_time):
+        recent_memory = self.memory_stream[-1]
+        relevant_memories = self.retrieve_memories(current_time, recent_memory)
+        relevant_memories = f'Here is the dialogue history: {[memory for memory in relevant_memories]}'
+        if len(dialogue_history) == 0:
+            conditional_context = self.status
+        else:
+            conditional_context = dialogue_history
+        question = f'What should {self.name} say to {other_agent.name}?'
+        prompt = '\n'.join([
+            self.summary_description,
+            time_prompt(current_time),
+            recent_memory.format_description(),
+            relevant_memories,
+            conditional_context,
+            question
+        ])
+        messages = [
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": prompt}
+        ]
+        response_text = model(messages)
+        # Parse continue_conversation and response, then return that
+        dictionary = json.loads(response_text)
+        return dictionary['continue_conversation'], dictionary['response']
+
+
+
+
+        

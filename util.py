@@ -16,4 +16,3 @@ def set_start_time(year, month, day, hour, minute, second):
 def time_prompt(curr_time):
     formatted_time = "It is " + time.strftime("%B %d, %Y, %I:%M %p.", curr_time)
     return formatted_time
-

@@ -1,0 +1,1 @@
+MODE = 'debugging'  # or 'testing'

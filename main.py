@@ -1,8 +1,10 @@
 import json
 import time
 from game import Game
+# import cProfile
 
-def gather_initial_data():
+
+def gather_initial_data(game):
     # Give original json to client
     data = game.initial_json()
 
@@ -11,7 +13,7 @@ def gather_initial_data():
         json.dump(data, file)
     return data
 
-def update_server_info():
+def update_server_info(i, game):
     # Reading a JSON file
     with open('game_info/to_server.json', 'r') as file:
         c_data = json.load(file)
@@ -22,7 +24,7 @@ def update_server_info():
         for c_agent, s_agent in zip(c_agents, game.agents):
             s_agent.position = c_agent['position']
     
-def send_server_info():
+def send_server_info(i, data, game, game_states):
     # Calculate the next step in the game
     game.update_agents()
     # Possibly end the game
@@ -36,18 +38,20 @@ def send_server_info():
     with open('game_info/to_client.json', 'w') as file:
         json.dump(data, file)
 
-if __name__ == "__main__":
-
-    game_states = 100
+def main():
+    game_states = 3
     time_step = 1 # seconds
     game = Game(time_step=time_step)
-    data = gather_initial_data()
+    data = gather_initial_data(game)
 
     for i in range(game_states):
-        update_server_info()
-        send_server_info()
+        print(i)
+        update_server_info(i, game)
+        send_server_info(i, data, game, game_states)
         
         # Delay the specified time
         # time.sleep(1)
 
     print('Done with simulation')
+
+main()

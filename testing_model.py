@@ -4,7 +4,7 @@ import os
 import json
 
 # Maximum number of API calls per day
-MAX_API_CALLS = 10
+MAX_API_CALLS = 200
 
 def model(messages):
     # Load or initialize the count and date

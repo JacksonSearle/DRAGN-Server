@@ -3,6 +3,11 @@ from agent import Agent
 from memory import Memory
 from tree import get_all_nodes, build_tree, places
 from character_sheets import character_sheets
+import config
+if config.MODE == 'debugging':
+    from debugging_model import model  # Import for debugging mode
+elif config.MODE == 'testing':
+    from testing_model import model  # Import for testing mode
 
 class Game:
     def __init__(self, time_step):
@@ -41,35 +46,33 @@ class Game:
         for place in self.places:
             if agent.is_within_range(place.x, place.y, place.z):
                 # Make an observation for that thing
-                memory = Memory(self.time, place.state())
+                memory = Memory(self.time, place.state)
                 agent.memory_stream.append(memory)
                 # Choose whether or not to react to each observation
                 react, interact = agent.react(self.time, memory)
                 if react:
-                    agent.regenerate_plan()
                     agent.status = interact
 
         # Percieve the people around them
-        for i, agent in enumerate(self.agents):
-            for j, other_agent in enumerate(self.agents):
-                # Make sure an agent isn't talking to themselves
-                if i != j and agent.is_within_range(other_agent.x, other_agent.y, other_agent.z):
-                    # Make both agents see eachother
-                    description = f'{other_agent.name} is {other_agent.status}'
+        for other_agent in self.agents:
+            # Make sure an agent isn't talking to themselves
+            if agent is not other_agent and agent.is_within_range(other_agent.x, other_agent.y, other_agent.z):
+                # One agent sees the other agent
+                description = f'{other_agent.name} is {other_agent.status}'
+                memory = Memory(self.time, description)
+                agent.memory_stream.append(memory)
+                
+                # Choose whether or not to react to seeing the other agent
+                react, interact = agent.react(self.time, memory)
+                if react:
+                    # make a memory for the person they are talking to
+                    description = f'{agent.name} is initiating a conversation with {other_agent.name}'
                     memory = Memory(self.time, description)
-                    agent.memory_stream.append(memory)
-                    
-                    # Choose whether or not to react to each observation
-                    react, interact = agent.react(self.time, memory)
-                    if react:
-                        # make a memory for the person they are talking to
-                        description = f'{agent.name} is {agent.status}'
-                        memory = Memory(self.time, description)
-                        other_agent.memory_stream.append(memory)
-                        # generate dialogue
-                        self.conversation(agent, other_agent)
-                        agent.regenerate_plan()
-                        other_agent.regenerate_plan()
+                    other_agent.memory_stream.append(memory)
+                    other_agent.status = description
+                    # generate dialogue
+                    self.conversation(agent, other_agent)
+
     
     def update(self, data):
         for i, agent in enumerate(self.agents):
@@ -90,4 +93,38 @@ class Game:
         return data
 
     def conversation(self, agent, other_agent):
-        pass
+        # Generate the conversation
+        dialogue_history = ""
+        continue_conversation = True
+        i = 0
+        while True:
+            continue_conversation, response = agent.respond(dialogue_history, other_agent, self.time)
+            dialogue_history += f'\n{agent.name}: {response}'
+            i += 1
+            if continue_conversation == False or i > 9:
+                break
+            continue_conversation, response = other_agent.respond(dialogue_history, agent, self.time)
+            dialogue_history += f'\n{other_agent.name}: {response}'
+            i += 1
+            if continue_conversation == False or i > 9:
+                break
+
+        # Set conversation for each agent and set destination and status to null
+        # TODO: could we set their destination to a halfway point between the agents?
+        agent.conversation, other_agent.conversation = dialogue_history, dialogue_history
+        agent.destination, other_agent.destination = None, None
+
+        # Put the conversation description into memory stream
+        conversation_description = self.create_conversation_description(dialogue_history)
+        shared_memory = Memory(self.time, conversation_description)
+        agent.memory_stream.append(shared_memory)
+        other_agent.memory_stream.append(shared_memory)
+    
+    def create_conversation_description(self, dialogue_history):
+        message = f'Generate a one sentence description of the following dialogue history:\n {dialogue_history}'
+        messages = [
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": message}
+        ]
+        response_text = model(messages)
+        return response_text

@@ -1,5 +1,9 @@
 import re
-from model import model
+import config
+if config.MODE == 'debugging':
+    from debugging_model import model  # Import for debugging mode
+elif config.MODE == 'testing':
+    from testing_model import model  # Import for testing mode
 
 class Memory:
     def __init__(self, time, description):
@@ -24,6 +28,9 @@ class Memory:
             number = 1
 
         return number
+    
+    def format_description(self):
+        return f'Observation: {self.description}'
 
 def find_integer_in_string(input_string):
     match = re.search(r'\d+', input_string)  # searches for the first contiguous integer
@@ -31,6 +38,4 @@ def find_integer_in_string(input_string):
         return (match.start(), match.end()-1)  # returns the starting and ending indices
     else:
         return None  # returns None if no integer is found
-
-
     
