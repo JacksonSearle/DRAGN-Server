@@ -25,6 +25,7 @@ class Agent:
         self.prep_seeds(time)
         self.vision_radius = character_sheet['vision_radius']
         self.waking_hours = character_sheet['waking_hours']
+        
         self.dayplan = None
         self.hourplans = ['Sleeping.']
         self.yesterday_summary = None
@@ -217,8 +218,4 @@ class Agent:
         # Parse continue_conversation and response, then return that
         dictionary = json.loads(response_text)
         return dictionary['continue_conversation'], dictionary['response']
-
-
-
-
-        
+    
