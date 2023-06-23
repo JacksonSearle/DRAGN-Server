@@ -10,6 +10,10 @@ def query_model(prompt):
 
 def model(messages):
     char = messages[1]["content"][0]
+    if 'What 5 high-level insights can you infer from ' in messages[1]["content"]:
+        return '1: Something insightful?\n2: Second insightful thing?\n3: Third insightful thing?\n4: Fourth insightful thing?\n5: Fifth insightful thing?'
+    if '3 most salient high-level questions' in messages[1]["content"]:
+        return 'Example question?\n Second example question?\n Third example question?'
     if 'single field, "state": string,' in messages[1]["content"]:
         return '{"state": "example state of object"}'
     if '"plan": string and "duration": int' in messages[1]["content"]:

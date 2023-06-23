@@ -108,7 +108,9 @@ class Agent:
 
     def plan_next(self,time):
         hourplan = '{self.name}\'s plan this hour: ' + self.hourplans[-1]
-        status = '{self.name}\'s status right now: ' + self.status
+        status = '{self.name}\'s status right now: '
+        if self.status != None:
+            status += self.status
         query = f'Given the context above, what does {self.name} plan to do right now, and for how long? Give your answer as a json dictionary object with "plan": string and "duration": int, and make the duration either 5, 10, or 15 minutes.'
         prompt = '\n'.join([time_prompt(time), hourplan, status, query])
         response_text = query_model(prompt)
@@ -140,7 +142,7 @@ class Agent:
         response_text = self.find_responses(response_text,5)
         for r in response_text: self.add_memory(Memory(time, r, "Reflection"))
 
-    def find_responses(s,i):
+    def find_responses(self, s, i):
         responses=[]
         for _ in range(i):
             match = re.search(r'\d. ', s)
