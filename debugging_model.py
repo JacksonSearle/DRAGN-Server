@@ -10,6 +10,8 @@ def query_model(prompt):
 
 def model(messages):
     char = messages[1]["content"][0]
+    if 'single field, "state": string,' in messages[1]["content"]:
+        return '{"state": "example state of object"}'
     if '"plan": string and "duration": int' in messages[1]["content"]:
         return '{"plan": "exampleminute plan", "duration": 5}'
     elif 'do this hour' in messages[1]["content"]:

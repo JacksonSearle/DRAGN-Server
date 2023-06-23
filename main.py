@@ -39,7 +39,7 @@ def send_server_info(i, data, game, game_states):
         json.dump(data, file)
 
 def main():
-    game_states = 60
+    game_states = 60 # number of time steps
     time_step = 60 # seconds
     game = Game(time_step=time_step)
     data = gather_initial_data(game)
