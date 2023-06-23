@@ -49,6 +49,7 @@ class Game:
                 }
             )
 
+
     def update_agents(self):
         increase_time(self.time, self.time_step)
         for agent in self.agents:
