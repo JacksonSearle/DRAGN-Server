@@ -133,13 +133,6 @@ class Game:
             data['agents'][i]['status'] = agent.status
             data['agents'][i]['destination'] = agent.destination
             data['agents'][i]['conversation'] = agent.conversation
-    
-    def query_model(self,prompt):
-        messages = [
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": prompt}
-        ]
-        return model(messages)
 
     def conversation(self, agent, other_agent):
         # Every conversation will be 5 minutes
