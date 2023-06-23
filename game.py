@@ -138,6 +138,10 @@ class Game:
         return model(messages)
 
     def conversation(self, agent, other_agent):
+        # Every conversation will be 5 minutes
+        agent.busy_time = 5 * 60
+        other_agent.busy_time = 5*60
+
         # Generate the conversation
         dialogue_history = ""
         continue_conversation = True

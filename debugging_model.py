@@ -18,13 +18,15 @@ def model(messages):
         return "they are highly dedicated to research"
     elif char == 'G':
         return "This person was talking about something. <insert dialogue history here>"
-    elif messages[1]["content"][-1] == 't': 
+    elif messages[1]["content"][-1] == 's': 
         number = random.randint(0, 1)
+        duration = random.randint(5,15)
         react = number == 0
         message = "this person is interacting with the object"
         data = {
             "react": react,
-            "message": message
+            "message": message,
+            "duration": duration
         }
         json_string = json.dumps(data)
         return json_string

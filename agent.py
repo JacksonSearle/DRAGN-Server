@@ -43,6 +43,7 @@ class Agent:
     def add_memory(self, memory):
         self.memory_stream.append(memory)
         self.reflect_buffer += memory.importance
+        # Check buffers
         if self.reflect_buffer > 150:
             self.reflect_buffer = 0
             self.reflect()
@@ -193,7 +194,7 @@ class Agent:
         # Generate prompt
         memories = self.retrieve_memories(current_time, memory.description)
         relevant_context = '\n'.join([memory.description for memory in memories])
-        question = f'Based on the context above, give a json dictionary object with "react": bool and "interact": string. It will decide whether the character should react to the observation, and if they reacted, how they would interact with the object'
+        question = f'Based on the context above, give a json dictionary object with "react": bool, "interact": string and "duration": int. It will decide whether the character should react to the observation, if they reacted how they would interact with the object, and how long they would interact with that object. Duration should be in minutes, somewhere between 5 and 15 minutes'
         prompt = '\n'.join([self.summary_description, time_prompt(current_time), self.format_status(), memory.format_description(), relevant_context, question])
         response_text = self.query_model(prompt)
 
@@ -204,6 +205,7 @@ class Agent:
 
         if dictionary['react']:
             self.status = dictionary['message']
+            self.duration = dictionary['duration'] * 60
 
         return dictionary['react'], dictionary['message']
     
