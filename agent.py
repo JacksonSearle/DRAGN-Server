@@ -55,7 +55,7 @@ class Agent:
         seeds = self.seed_memories.split(';')
         for seed in seeds:
             memory = Memory(time, seed)
-            self.add_memory(memory)
+            self.memory_stream.append(memory)
 
     def is_within_range(self, x2, y2, z2):
         x1, y1, z1 = self.x, self.y, self.z

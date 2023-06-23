@@ -2,7 +2,7 @@ from util import *
 import json
 from agent import Agent
 from memory import Memory
-from tree import get_all_nodes, build_tree, places
+from tree import get_all_nodes, build_tree
 from character_sheets import character_sheets
 import config
 if config.MODE == 'debugging':
@@ -14,10 +14,23 @@ class Game:
     def __init__(self, time_step):
         self.time_step = time_step
         self.time = set_start_time(2023, 5, 24, 7, 0, 0)
-        self.root = build_tree(places)
+        with open('world_tree.json', 'r') as file:
+            self.root = build_tree(json.load(file))
         self.places = get_all_nodes(self.root) # These are all visitable places
         self.agents = self.make_agents()
         self.make_agent_info()
+
+    def initial_json(self):
+        data = {}
+        data['stop'] = False
+        data['agents'] = []
+        for i, agent in enumerate(self.agents):
+            data['agents'].append({})
+            data['agents'][i]['name'] = agent.name
+            data['agents'][i]['status'] = agent.status
+            data['agents'][i]['destination'] = agent.destination
+            data['agents'][i]['conversation'] = agent.conversation
+        return data
     
     def make_agents(self):
         agents = []
@@ -121,17 +134,6 @@ class Game:
             data['agents'][i]['destination'] = agent.destination
             data['agents'][i]['conversation'] = agent.conversation
 
-    def initial_json(self):
-        data = {}
-        data['stop'] = False
-        data['agents'] = []
-        for i, agent in enumerate(self.agents):
-            data['agents'].append({})
-            data['agents'][i]['name'] = agent.name
-            data['agents'][i]['status'] = agent.status
-            data['agents'][i]['destination'] = agent.destination
-            data['agents'][i]['conversation'] = agent.conversation
-        return data
     
     def query_model(self,prompt):
         messages = [

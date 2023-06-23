@@ -15,15 +15,12 @@ class Node:
         return f'({self.path}) {self.name} {self.state}'
 
 def build_tree(data, parent=None, path=''):
-    x, y, z = map(int, data['position'].split(',')) if data['position'] != None else (None, None, None)
+    x, y, z = data['position'] if data['position'] else (None, None, None)
     path = path + '/' + data['name'] if path else data['name']
     node = Node(data['name'], path, x, y, z)
-    if parent:
-        parent.add_child(node)
-    for child in data['children']:
-        build_tree(child, node, path)
-
-    return node
+    for child in data['children']: build_tree(child, node, path)
+    if parent: parent.add_child(node)
+    else: return node
 
 def get_all_nodes(root):
     nodes = []
@@ -34,7 +31,7 @@ def get_all_nodes(root):
             nodes += get_all_nodes(child)
     return nodes
 
-places = {
+temp_places = {
         'name': 'World',
         'position': None,
         'children': [
@@ -48,17 +45,17 @@ places = {
                         'children': [
                             {
                                 'name': 'Chair 1',
-                                'position': '0, 7, 0',
+                                'position': [-2015, -3356, 500],
                                 'children': []
                             },
                             {
                                 'name': 'Chair 2',
-                                'position': '2, 7, 0',
+                                'position': [-2015, -3356, 500],
                                 'children': []
                             },
                             {
                                 'name': 'Table',
-                                'position': '1, 7, 0',
+                                'position': [-2015, -3356, 500],
                                 'children': []
                             },
                         ]
@@ -69,7 +66,7 @@ places = {
                         'children': [
                             {
                                 'name': 'Bed',
-                                'position': '0, 9, 0',
+                                'position': [-2015, -3356, 500],
                                 'children': []
                             }
                         ]
@@ -86,17 +83,17 @@ places = {
                         'children': [
                             {
                                 'name': 'Chair 1',
-                                'position': '7, 7, 0',
+                                'position': [-2015, -3356, 500],
                                 'children': []
                             },
                             {
                                 'name': 'Chair 2',
-                                'position': '8, 7, 0',
+                                'position': [-2015, -3356, 500],
                                 'children': []
                             },
                             {
                                 'name': 'Table',
-                                'position': '9, 7, 0',
+                                'position': [-2015, -3356, 500],
                                 'children': []
                             },
                         ]
@@ -107,12 +104,12 @@ places = {
                         'children': [
                             {
                                 'name': 'Bob\'s Bed',
-                                'position': '9, 9, 0',
+                                'position': [-2015, -3356, 500],
                                 'children': []
                             },
                             {
                                 'name': 'Alice\'s Bed',
-                                'position': '8, 9, 0',
+                                'position': [-2015, -3356, 500],
                                 'children': []
                             }
                         ]
@@ -129,22 +126,22 @@ places = {
                         'children': [
                             {
                                 'name': 'Seat 1',
-                                'position': '0, 2, 0',
+                                'position': [-2015, -3356, 500],
                                 'children': []
                             },
                             {
                                 'name': 'Seat 2',
-                                'position': '2, 2, 0',
+                                'position': [-2015, -3356, 500],
                                 'children': []
                             },
                             {
                                 'name': 'Seat 3',
-                                'position': '0, 1, 0',
+                                'position': [-2015, -3356, 500],
                                 'children': []
                             },
                             {
                                 'name': 'Seat 4',
-                                'position': '2, 1, 0',
+                                'position': [-2015, -3356, 500],
                                 'children': []
                             },
                         ]
@@ -155,12 +152,12 @@ places = {
                         'children': [
                             {
                                 'name': 'toilet',
-                                'position': '0, 3, 0',
+                                'position': [-2015, -3356, 500],
                                 'children': []
                             },
                             {
                                 'name': 'sink',
-                                'position': '1, 3, 0',
+                                'position': [-2015, -3356, 500],
                                 'children': []
                             },
                         ]
@@ -173,19 +170,19 @@ places = {
                 'children': [
                     {
                         'name': 'Swimmable Area',
-                        'position': '0, 9, 0',
+                        'position': [-2015, -3356, 500],
                         'children': []
                     },
                     {
                         'name': 'Fishable Area',
-                        'position': '0, 7, 0',
+                        'position': [-2015, -3356, 500],
                         'children': []
                     }
                 ]
             },
             {
                 'name': 'Park',
-                'position': '4, 4, 0',
+                'position': [-2015, -3356, 500],
                 'children': []
             },
         ]
