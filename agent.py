@@ -10,9 +10,9 @@ from memory import Memory
 import config
 
 if config.MODE == 'debugging':
-    from debugging_model import model  # Import for debugging mode
+    from debugging_model import query_model  # Import for debugging mode
 elif config.MODE == 'testing':
-    from testing_model import model  # Import for testing mode
+    from testing_model import query_model  # Import for testing mode
 
 class Agent:
     def __init__(self, character_sheet, time):
@@ -42,8 +42,10 @@ class Agent:
 
     def add_memory(self, memory):
         self.memory_stream.append(memory)
+        # Update buffers
         self.reflect_buffer += memory.importance
         self.summary_description_buffer += memory.importance
+        # Check buffers
         if self.reflect_buffer > 150:
             self.reflect_buffer = 0
             self.reflect(memory.time)
@@ -64,13 +66,6 @@ class Agent:
 
     def prompt(self):
         return self.summary_description +'\n'+ format_time(self.time) +'\n'+ self.status +'\n'+ self.memory_stream[-1].description() +'\n'+ self.revelant_context_summary
-    
-    def query_model(self,prompt):
-        messages = [
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": prompt}
-        ]
-        return model(messages)
 
     def retrieve_memories(self,time,query,k=4):
         score = []
@@ -98,7 +93,7 @@ class Agent:
     def plan_day(self,time):
         query = f'It is {format_time(time)}. What are {self.name}\'s plans today, given the following summary of what he did yesterday?'
         prompt = '\n'.join([self.summary_description, query, self.yesterday_summary])
-        response_text = self.query_model(prompt)
+        response_text = query_model(prompt)
         self.dayplan = response_text
         self.plan_hour(time) 
     
@@ -107,16 +102,18 @@ class Agent:
         lastplan = '{self.name}\'s plan for the last hour: ' + self.hourplans[-1]
         query = f'Given the context above, what does {self.name} plan to do this hour?'
         prompt = '\n'.join([dayplan, lastplan, query])
-        response_text = self.query_model(prompt)
+        response_text = query_model(prompt)
         self.hourplans.append(response_text)
         self.plan_next(time)  
 
     def plan_next(self,time):
         hourplan = '{self.name}\'s plan this hour: ' + self.hourplans[-1]
-        status = '{self.name}\'s status right now: ' + self.status
+        status = '{self.name}\'s status right now: '
+        if self.status != None:
+            status += self.status
         query = f'Given the context above, what does {self.name} plan to do right now, and for how long? Give your answer as a json dictionary object with "plan": string and "duration": int, and make the duration either 5, 10, or 15 minutes.'
         prompt = '\n'.join([time_prompt(time), hourplan, status, query])
-        response_text = self.query_model(prompt)
+        response_text = query_model(prompt)
         # TODO: Ensure it's a json or reprompt
         dictionary = json.loads(response_text)
         self.status, self.busy_time = dictionary['plan'], dictionary['duration']*60
@@ -132,7 +129,7 @@ class Agent:
         relevant_context = '\n'.join([memory.description for memory in self.memory_stream[-100:]])
         question = f'Given only the information above, what are 3 most salient high-level questions we can answer about the subjects in the statements?'
         prompt = '\n'.join([relevant_context, question])
-        response_queries = self.query_model(prompt)
+        response_queries = query_model(prompt)
         response_queries = self.find_responses(response_queries,3)
 
         statements = f"Statements about {self.name}\n"
@@ -141,11 +138,11 @@ class Agent:
             statements += '\n'.join([memory.description for memory in memories])
         question = "What 5 high-level insights can you infer from the above statements?"
         prompt = '\n'.join([statements, question])
-        response_text = self.query_model(prompt)
+        response_text = query_model(prompt)
         response_text = self.find_responses(response_text,5)
         for r in response_text: self.add_memory(Memory(time, r, "Reflection"))
 
-    def find_responses(s,i):
+    def find_responses(self, s, i):
         responses=[]
         for _ in range(i):
             match = re.search(r'\d. ', s)
@@ -184,7 +181,7 @@ class Agent:
         query = f'How would one describe {self.name}\'s {text} given the following statements?'
         memories = self.retrieve_memories(time, query, k)
         prompt = '\n'.join([query] + [memory.description for memory in memories])
-        response_text = self.query_model(prompt)
+        response_text = query_model(prompt)
         return response_text
 
     def format_status(self):
@@ -194,9 +191,9 @@ class Agent:
         # Generate prompt
         memories = self.retrieve_memories(current_time, memory.description)
         relevant_context = '\n'.join([memory.description for memory in memories])
-        question = f'Based on the context above, give a json dictionary object with "react": bool and "interact": string. It will decide whether the character should react to the observation, and if they reacted, how they would interact with the object'
+        question = f'Based on the context above, give a json dictionary object with "react": bool, "interact": string and "duration": int. It will decide whether the character should react to the observation, if they reacted how they would interact with the object, and how long they would interact with that object. Duration should be in minutes, somewhere between 5 and 15 minutes'
         prompt = '\n'.join([self.summary_description, time_prompt(current_time), self.format_status(), memory.format_description(), relevant_context, question])
-        response_text = self.query_model(prompt)
+        response_text = query_model(prompt)
 
         # TODO: Ensure it's a json or reprompt
         
@@ -205,6 +202,7 @@ class Agent:
 
         if dictionary['react']:
             self.status = dictionary['message']
+            self.duration = dictionary['duration'] * 60
 
         return dictionary['react'], dictionary['message']
     
@@ -225,11 +223,7 @@ class Agent:
             conditional_context,
             question
         ])
-        messages = [
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": prompt}
-        ]
-        response_text = model(messages)
+        response_text = query_model(prompt)
         # Parse continue_conversation and response, then return that
         dictionary = json.loads(response_text)
         return dictionary['continue_conversation'], dictionary['response']

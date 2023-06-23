@@ -6,9 +6,9 @@ from tree import get_all_nodes, build_tree
 from character_sheets import character_sheets
 import config
 if config.MODE == 'debugging':
-    from debugging_model import model  # Import for debugging mode
+    from debugging_model import query_model  # Import for debugging mode
 elif config.MODE == 'testing':
-    from testing_model import model  # Import for testing mode
+    from testing_model import query_model  # Import for testing mode
 
 class Game:
     def __init__(self, time_step):
@@ -108,10 +108,10 @@ class Game:
         if agent.object: agent.object.state = "idle"
         agent.object = self.choose_location(agent)
         prompt = f'{agent.name} is {agent.status} at the {agent.object}. Generate a JSON dictionary object with a single field, "state": string, which describes the state the {agent.object} is in.'
-        response_text = self.query_model(prompt)
+        response_text = query_model(prompt)
         # TODO: Ensure it's a json or reprompt
         agent.object.state = json.loads(response_text)['state']
-        agent.destination = {"x":object.x, "y":object.y, "z":object.z}
+        agent.destination = {"x":agent.object.x, "y":agent.object.y, "z":agent.object.z}
     
     def choose_location(self,agent,root=None):
         if not root: root = self.root
@@ -121,7 +121,7 @@ class Game:
             choices = '\n'.join([choices,s])
         query = f'Given the places above, write a JSON dictionary object with "choice": int. Make its value the index of the place which is the most reasonable for {agent.name} to do the following activity: {agent.status}'
         prompt = '\n'.join([choices, query])
-        response_text = self.query_model(prompt)
+        response_text = query_model(prompt)
         # TODO: Ensure it's a json or reprompt
         dictionary = json.loads(response_text)
         location = root.children[dictionary['choice']]
@@ -133,7 +133,6 @@ class Game:
             data['agents'][i]['status'] = agent.status
             data['agents'][i]['destination'] = agent.destination
             data['agents'][i]['conversation'] = agent.conversation
-
     
     def query_model(self,prompt):
         messages = [
@@ -143,6 +142,10 @@ class Game:
         return model(messages)
 
     def conversation(self, agent, other_agent):
+        # Every conversation will be 5 minutes
+        agent.busy_time = 5 * 60
+        other_agent.busy_time = 5*60
+
         # Generate the conversation
         dialogue_history = ""
         continue_conversation = True
@@ -172,5 +175,5 @@ class Game:
     
     def create_conversation_description(self, dialogue_history):
         message = f'Generate a one sentence description of the following dialogue history:\n {dialogue_history}'
-        response_text = self.query_model(message)
+        response_text = query_model(message)
         return response_text
