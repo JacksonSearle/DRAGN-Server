@@ -6,6 +6,13 @@ import json
 # Maximum number of API calls per day
 MAX_API_CALLS = 200
 
+def query_model(prompt):
+    messages = [
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": prompt}
+    ]
+    return model(messages)
+
 def model(messages):
     # Load or initialize the count and date
     filename = 'prompts/api_calls.json'

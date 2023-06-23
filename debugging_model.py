@@ -1,6 +1,13 @@
 import random
 import json
 
+def query_model(prompt):
+    messages = [
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": prompt}
+    ]
+    return model(messages)
+
 def model(messages):
     char = messages[1]["content"][0]
     if '"plan": string and "duration": int' in messages[1]["content"]:

@@ -10,9 +10,9 @@ from memory import Memory
 import config
 
 if config.MODE == 'debugging':
-    from debugging_model import model  # Import for debugging mode
+    from debugging_model import query_model  # Import for debugging mode
 elif config.MODE == 'testing':
-    from testing_model import model  # Import for testing mode
+    from testing_model import query_model  # Import for testing mode
 
 class Agent:
     def __init__(self, character_sheet, time):
@@ -66,13 +66,6 @@ class Agent:
 
     def prompt(self):
         return self.summary_description +'\n'+ format_time(self.time) +'\n'+ self.status +'\n'+ self.memory_stream[-1].description() +'\n'+ self.revelant_context_summary
-    
-    def query_model(self,prompt):
-        messages = [
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": prompt}
-        ]
-        return model(messages)
 
     def retrieve_memories(self,time,query,k=4):
         score = []
@@ -228,11 +221,7 @@ class Agent:
             conditional_context,
             question
         ])
-        messages = [
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": prompt}
-        ]
-        response_text = model(messages)
+        response_text = query_model(prompt)
         # Parse continue_conversation and response, then return that
         dictionary = json.loads(response_text)
         return dictionary['continue_conversation'], dictionary['response']

@@ -6,9 +6,9 @@ from tree import get_all_nodes, build_tree, places
 from character_sheets import character_sheets
 import config
 if config.MODE == 'debugging':
-    from debugging_model import model  # Import for debugging mode
+    from debugging_model import query_model  # Import for debugging mode
 elif config.MODE == 'testing':
-    from testing_model import model  # Import for testing mode
+    from testing_model import query_model  # Import for testing mode
 
 class Game:
     def __init__(self, time_step):
@@ -132,13 +132,6 @@ class Game:
             data['agents'][i]['destination'] = agent.destination
             data['agents'][i]['conversation'] = agent.conversation
         return data
-    
-    def query_model(self,prompt):
-        messages = [
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": prompt}
-        ]
-        return model(messages)
 
     def conversation(self, agent, other_agent):
         # Every conversation will be 5 minutes
