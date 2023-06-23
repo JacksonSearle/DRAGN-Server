@@ -42,14 +42,16 @@ class Agent:
 
     def add_memory(self, memory):
         self.memory_stream.append(memory)
+        # Update buffers
         self.reflect_buffer += memory.importance
+        self.summary_description_buffer += memory.importance
         # Check buffers
         if self.reflect_buffer > 150:
             self.reflect_buffer = 0
-            self.reflect()
+            self.reflect(memory.time)
         if self.summary_description_buffer > 40:
             self.summary_description_buffer = 0
-            self.update_summary_description()
+            self.update_summary_description(memory.time)
 
     def prep_seeds(self, time):
         seeds = self.seed_memories.split(';')
