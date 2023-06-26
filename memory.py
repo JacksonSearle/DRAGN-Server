@@ -1,4 +1,6 @@
 import re
+import json
+from util import *
 import config
 from sentence_embed import embed
 
@@ -17,11 +19,18 @@ class Memory:
         self.importance = self.generate_importance()
 
     def generate_importance(self):
-        # prompt chatgpt
-        prompt = f'On the scale of 1 to 10, where 1 is purely mundane (e.g., brushing teeth, making bed) and 10 is extremely poignant (e.g., a break up, college acceptance), rate the likely poignancy of the following piece of memory. Give no explanation. Only print the number. Memory: {self.description}'
+        # Prompt chatgpt
+        prompt = f'On the scale of 1 to 10, where 1 is purely mundane (e.g., brushing teeth, making bed) and 10 is extremely poignant (e.g., a break up, college acceptance), rate the likely poignancy of the following piece of memory. Return your answer as a JSON object with one field, importance: int. Memory: {self.description}'
         output = query_model(prompt)
-        start, end = find_integer_in_string(output)
-        number = int(output[start:end+1])
+
+        # Turn it into a JSON
+        output = brackets(output)
+        if output == "error":
+            output = '{"importance": 5}'
+        data = json.loads(output)
+        number = data["importance"]
+
+        # Check out of bounds numbers
         if number > 10:
             number = 10
         if number < 1:

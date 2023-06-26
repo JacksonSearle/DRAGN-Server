@@ -61,7 +61,8 @@ class Game:
         for place in self.places:
             if agent.is_within_range(place.x, place.y, place.z):
                 # Make an observation for that thing
-                memory = Memory(self.time, place.state)
+                description = f'{place.name} is {place.state}'
+                memory = Memory(self.time, description)
                 agent.add_memory(memory)
                 # Choose whether or not to react to each observation
                 react, interact = agent.react(self.time, memory)
@@ -94,24 +95,44 @@ class Game:
     def execute_plan(self,agent):
         if agent.object: agent.object.state = "idle"
         agent.object = self.choose_location(agent)
-        prompt = f'{agent.name} is {agent.status} at the {agent.object}. Generate a JSON dictionary object with a single field, "state": string, which describes the state the {agent.object} is in.'
+        prompt = f'{agent.name} is {agent.status} at the {agent.object.name}. Generate a JSON dictionary object with a single field, "state": string, which describes the state the {agent.object.name} is in.'
         response_text = query_model(prompt)
+        # Extract the contents between the brackets
+        response_text = brackets(response_text)
         # TODO: Ensure it's a json or reprompt
-        agent.object.state = json.loads(response_text)['state']
+        if response_text == 'error':
+            agent.object.state = 'error'
+            print('error in executing plan')
+        else:
+            agent.object.state = json.loads(response_text)['state']
         agent.destination = {"x":agent.object.x, "y":agent.object.y, "z":agent.object.z}
     
     def choose_location(self,agent,root=None):
         if not root: root = self.root
         choices = ''
         for c in range(len(root.children)): 
-            s = f'{c}: {root.children[c].name}'
+            # This is one indexed
+            s = f'{c+1}: {root.children[c].name}'
             choices = '\n'.join([choices,s])
-        query = f'Given the places above, write a JSON dictionary object with "choice": int. Make its value the index of the place which is the most reasonable for {agent.name} to do the following activity: {agent.status}'
+        query = f'Given the place(s) above, write a JSON dictionary object with "choice": int. Choice should be one of the indexes shown above. Make its value the index of the place which is the most reasonable for {agent.name} to do the following activity: {agent.status}'
         prompt = '\n'.join([choices, query])
-        response_text = query_model(prompt)
-        # TODO: Ensure it's a json or reprompt
+        response_text = 'error'
+        while response_text == 'error':
+            response_text = query_model(prompt)
+            # TODO: Ensure it's a json or reprompt
+            # Extract the contents between the brackets
+            response_text = brackets(response_text)
         dictionary = json.loads(response_text)
-        location = root.children[dictionary['choice']]
+        # Un-one index it
+        if 'choice' not in dictionary.keys():
+            index = 0
+            print('Choice set to default')
+        else:
+            index = dictionary['choice'] - 1
+        if index > len(root.children) - 1 or index < 0:
+            index = 0
+            print(f'Choice set to default')
+        location = root.children[index]
         if not location.children: return location
         return self.choose_location(agent,location)
 

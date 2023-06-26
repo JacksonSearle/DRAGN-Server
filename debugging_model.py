@@ -38,7 +38,7 @@ def model(messages):
         message = "this person is interacting with the object"
         data = {
             "react": react,
-            "message": message,
+            "interact": message,
             "duration": duration
         }
         json_string = json.dumps(data)

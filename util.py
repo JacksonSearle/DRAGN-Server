@@ -1,5 +1,14 @@
 import time
 
+def brackets(response_text):
+    start_index = response_text.find('{')  # Find the index of the first opening bracket
+    end_index = response_text.rfind('}')  # Find the index of the last closing bracket
+    if start_index == -1 or end_index == -1:
+        response_text = "error"  # Return None if either bracket is not found
+    else:
+        response_text = response_text[start_index:end_index + 1]
+    return response_text
+
 def format_time(curr_time):
     formatted_time = time.strftime("%Y-%m-%d %H:%M:%S", curr_time)
     return formatted_time

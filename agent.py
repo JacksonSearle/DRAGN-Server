@@ -32,7 +32,7 @@ class Agent:
         self.yesterday_summary = ''
 
         self.destination = None
-        self.status = None
+        self.status = 'idle'
         self.object = None
         self.conversation = None
         self.summary_description = None
@@ -56,7 +56,8 @@ class Agent:
     def prep_seeds(self, time):
         seeds = self.seed_memories.split(';')
         for seed in seeds:
-            memory = Memory(time, seed)
+            description = self.name + ' ' + seed
+            memory = Memory(time, description)
             self.memory_stream.append(memory)
 
     def is_within_range(self, x2, y2, z2):
@@ -98,8 +99,8 @@ class Agent:
         self.plan_hour(time) 
     
     def plan_hour(self,time):
-        dayplan = '{self.name}\'s daily plan: ' + self.dayplan
-        lastplan = '{self.name}\'s plan for the last hour: ' + self.hourplans[-1]
+        dayplan = f'{self.name}\'s daily plan: ' + self.dayplan
+        lastplan = f'{self.name}\'s plan for the last hour: ' + self.hourplans[-1]
         query = f'Given the context above, what does {self.name} plan to do this hour?'
         prompt = '\n'.join([dayplan, lastplan, query])
         response_text = query_model(prompt)
@@ -108,13 +109,12 @@ class Agent:
 
     def plan_next(self,time):
         hourplan = '{self.name}\'s plan this hour: ' + self.hourplans[-1]
-        status = '{self.name}\'s status right now: '
-        if self.status != None:
-            status += self.status
-        query = f'Given the context above, what does {self.name} plan to do right now, and for how long? Give your answer as a json dictionary object with "plan": string and "duration": int, and make the duration either 5, 10, or 15 minutes.'
+        status = '{self.name}\'s status right now: '+ self.status
+        query = f'Given the context above, what does {self.name} plan to do right now, and for how long? Give your answer as a json dictionary object with "plan": string and "duration": int, and make the duration either 5, 10, or 15 minutes. Describe plan in 8 words or less.'
         prompt = '\n'.join([time_prompt(time), hourplan, status, query])
         response_text = query_model(prompt)
         # TODO: Ensure it's a json or reprompt
+        response_text = brackets(response_text)
         dictionary = json.loads(response_text)
         self.status, self.busy_time = dictionary['plan'], dictionary['duration']*60
     
@@ -190,31 +190,35 @@ class Agent:
     def react(self, current_time, memory):
         # Generate prompt
         memories = self.retrieve_memories(current_time, memory.description)
-        relevant_context = '\n'.join([memory.description for memory in memories])
-        question = f'Based on the context above, give a json dictionary object with "react": bool, "interact": string and "duration": int. It will decide whether the character should react to the observation, if they reacted how they would interact with the object, and how long they would interact with that object. Duration should be in minutes, somewhere between 5 and 15 minutes'
+        relevant_context = "Relevant Context:\n"
+        relevant_context += '\n'.join([memory.description for memory in memories])
+        question = f'Based on the context above, give a json dictionary object with "react": bool, "interact": string and "duration": int. The react bool will show if {self.name} should react to the observation. The interact string will show how {self.name} would interact to the observation. The duration int shows how long {self.name} would interact with that object. Duration should be in minutes, somewhere between 5 and 15 minutes. If the observation is that something is idle, do not react.'
         prompt = '\n'.join([self.summary_description, time_prompt(current_time), self.format_status(), memory.format_description(), relevant_context, question])
         response_text = query_model(prompt)
 
         # TODO: Ensure it's a json or reprompt
         
         # Parse output to json
+        response_text = brackets(response_text)
         dictionary = json.loads(response_text)
 
         if dictionary['react']:
-            self.status = dictionary['message']
+            self.status = dictionary['interact']
             self.duration = dictionary['duration'] * 60
+        else:
+            dictionary['interact'] = ""
 
-        return dictionary['react'], dictionary['message']
+        return dictionary['react'], dictionary['interact']
     
     def respond(self, dialogue_history, other_agent, current_time):
         recent_memory = self.memory_stream[-1]
         relevant_memories = self.retrieve_memories(current_time, recent_memory.description)
-        relevant_memories = f'Here is the dialogue history: {[memory for memory in relevant_memories]}'
+        relevant_memories = f'Here is the dialogue history: {[memory.description for memory in relevant_memories]}'
         if len(dialogue_history) == 0:
             conditional_context = self.status
         else:
             conditional_context = dialogue_history
-        question = f'What should {self.name} say to {other_agent.name}?'
+        question = f'What (if anything) should {self.name} say to {other_agent.name}? Give your response as a JSON object with two fields, response: str, and continue_conversation: bool.'
         prompt = '\n'.join([
             self.summary_description,
             time_prompt(current_time),
@@ -224,8 +228,16 @@ class Agent:
             question
         ])
         response_text = query_model(prompt)
+        response_text = brackets(response_text)
         # Parse continue_conversation and response, then return that
-        dictionary = json.loads(response_text)
+        try:
+            dictionary = json.loads(response_text)
+        except:
+            dictionary = {
+                'continue_conversation': False,
+                'response': 'none'
+            }
+            print('Conversation ended preemptively')
         return dictionary['continue_conversation'], dictionary['response']
 
     
