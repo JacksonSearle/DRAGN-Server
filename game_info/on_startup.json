@@ -1,0 +1,815 @@
+{
+    "allDestinations": [
+      {
+        "namesId": [
+          "destination",
+          "townSquare3"
+        ],
+        "location": {
+          "x": -2015,
+          "y": -3356,
+          "z": 500
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "gathering"
+        ],
+        "location": {
+          "x": 4972,
+          "y": -8350,
+          "z": 294
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "townsquare2"
+        ],
+        "location": {
+          "x": -1958,
+          "y": -4488,
+          "z": 500
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "townsquare"
+        ],
+        "location": {
+          "x": -1901,
+          "y": -4272,
+          "z": 564
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "villageGate"
+        ],
+        "location": {
+          "x": -611,
+          "y": -5613,
+          "z": 500
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "mountain"
+        ],
+        "location": {
+          "x": 5669,
+          "y": 1403,
+          "z": 500
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "A&B_house",
+          "A&B_livingRoom"
+        ],
+        "location": {
+          "x": -487,
+          "y": -3228,
+          "z": 715
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "A&B_house",
+          "A&B_balcony"
+        ],
+        "location": {
+          "x": -360,
+          "y": -3076,
+          "z": 976
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "A&B_house",
+          "A&B_bedroom",
+          "A&B_desk"
+        ],
+        "location": {
+          "x": -196,
+          "y": -3712,
+          "z": 1009
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "A&B_house",
+          "A&B_bedroom",
+          "A&B_bed"
+        ],
+        "location": {
+          "x": -562,
+          "y": -3754,
+          "z": 1009
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "A&B_house",
+          "A&B_bedroom"
+        ],
+        "location": {
+          "x": -562,
+          "y": -3524,
+          "z": 1009
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "A&B_house",
+          "A&B_livingRoom",
+          "A&B_table"
+        ],
+        "location": {
+          "x": -394,
+          "y": -3747,
+          "z": 716
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "A&B_house"
+        ],
+        "location": {
+          "x": -967,
+          "y": -3499,
+          "z": 646
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Frank_house",
+          "Frank_livingRoom"
+        ],
+        "location": {
+          "x": -450.2600836708617,
+          "y": -4249.512965622804,
+          "z": 715
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Frank_house",
+          "Frank_balcony"
+        ],
+        "location": {
+          "x": -278.9320595830858,
+          "y": -4150.116244539167,
+          "z": 976
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Frank_house",
+          "Frank_bedroom",
+          "Frank_desk"
+        ],
+        "location": {
+          "x": -259.3472773939294,
+          "y": -4756.85205520736,
+          "z": 1009
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Frank_house",
+          "Frank_bedroom",
+          "Frank_bed"
+        ],
+        "location": {
+          "x": -618.6396230847797,
+          "y": -4703.1397747608125,
+          "z": 1009
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Frank_house",
+          "Frank_bedroom"
+        ],
+        "location": {
+          "x": -571.9749912886996,
+          "y": -4487.010471554637,
+          "z": 1009
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Frank_house",
+          "Frank_livingRoom",
+          "Frank_table"
+        ],
+        "location": {
+          "x": -492.37712151430117,
+          "y": -4769.021309627327,
+          "z": 716
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Frank_house"
+        ],
+        "location": {
+          "x": -994,
+          "y": -4340,
+          "z": 646
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Joseph_house",
+          "Joseph_livingRoom"
+        ],
+        "location": {
+          "x": -1081.5018080885338,
+          "y": -2444.5338267435495,
+          "z": 715
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Joseph_house",
+          "Joseph_balcony"
+        ],
+        "location": {
+          "x": -1030.6386936283207,
+          "y": -2253.1025243379518,
+          "z": 976
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Joseph_house",
+          "Joseph_bedroom",
+          "Joseph_desk"
+        ],
+        "location": {
+          "x": -613.2190054143604,
+          "y": -2760.204883743696,
+          "z": 1009
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Joseph_house",
+          "Joseph_bedroom",
+          "Joseph_bed"
+        ],
+        "location": {
+          "x": -927.1776896824497,
+          "y": -2952.9480930083337,
+          "z": 1009
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Joseph_house",
+          "Joseph_bedroom"
+        ],
+        "location": {
+          "x": -1024.3798881837056,
+          "y": -2744.4973013344143,
+          "z": 1009
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Joseph_house",
+          "Joseph_livingRoom",
+          "Joseph_table"
+        ],
+        "location": {
+          "x": -777.8763090786338,
+          "y": -2875.6040720336923,
+          "z": 716
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Joseph_house"
+        ],
+        "location": {
+          "x": -1402,
+          "y": -2893,
+          "z": 646
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Claire&Doug_house",
+          "Claire&Doug_livingRoom"
+        ],
+        "location": {
+          "x": -2145.7526344126663,
+          "y": -2161.4427130395684,
+          "z": 715
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Claire&Doug_house",
+          "Claire&Doug_balcony"
+        ],
+        "location": {
+          "x": -2229.8388963080642,
+          "y": -1982.1036467586441,
+          "z": 976
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Claire&Doug_house",
+          "Claire&Doug_bedroom",
+          "Claire&Doug_desk"
+        ],
+        "location": {
+          "x": -1584.1177505499058,
+          "y": -2102.254394584854,
+          "z": 1009
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Claire&Doug_house",
+          "Claire&Doug_bedroom",
+          "Claire&Doug_bed"
+        ],
+        "location": {
+          "x": -1700.7311137464076,
+          "y": -2451.7130101984167,
+          "z": 1009
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Claire&Doug_house",
+          "Claire&Doug_bedroom"
+        ],
+        "location": {
+          "x": -1909.1819026588687,
+          "y": -2354.510805577167,
+          "z": 1009
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Claire&Doug_house",
+          "Claire&Doug_livingRoom",
+          "Claire&Doug_table"
+        ],
+        "location": {
+          "x": -1636.0753971846707,
+          "y": -2296.494975586313,
+          "z": 716
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Claire&Doug_house"
+        ],
+        "location": {
+          "x": -2103,
+          "y": -2711,
+          "z": 646
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Irene_house",
+          "Irene_livingRoom"
+        ],
+        "location": {
+          "x": -3150.192193055793,
+          "y": -2848.692861120821,
+          "z": 715
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Irene_house",
+          "Irene_balcony"
+        ],
+        "location": {
+          "x": -3336.177421951231,
+          "y": -2916.828715732,
+          "z": 976
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Irene_house",
+          "Irene_bedroom",
+          "Irene_desk"
+        ],
+        "location": {
+          "x": -3160.205563277479,
+          "y": -2284.036566365423,
+          "z": 1009
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Irene_house",
+          "Irene_bedroom",
+          "Irene_bed"
+        ],
+        "location": {
+          "x": -2822.2402714486275,
+          "y": -2430.6635132303345,
+          "z": 1009
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Irene_house",
+          "Irene_bedroom"
+        ],
+        "location": {
+          "x": -2937.240279635964,
+          "y": -2629.8493511156935,
+          "z": 1009
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Irene_house",
+          "Irene_livingRoom",
+          "Irene_table"
+        ],
+        "location": {
+          "x": -2971.2325351383156,
+          "y": -2352.7256842880856,
+          "z": 716
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Irene_house",
+          "None"
+        ],
+        "location": {
+          "x": -2599,
+          "y": -2854,
+          "z": 646
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Ginny_house",
+          "Ginny_livingRoom"
+        ],
+        "location": {
+          "x": -3472.739920326852,
+          "y": -3862.487006754907,
+          "z": 715
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Ginny_house",
+          "Ginny_balcony"
+        ],
+        "location": {
+          "x": -3644.067949006043,
+          "y": -3961.8837206425696,
+          "z": 976
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Ginny_house",
+          "Ginny_bedroom",
+          "Ginny_desk"
+        ],
+        "location": {
+          "x": -3580.652699872614,
+          "y": -3308.1479128127685,
+          "z": 1009
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Ginny_house",
+          "Ginny_bedroom",
+          "Ginny_bed"
+        ],
+        "location": {
+          "x": -3222.3603581503294,
+          "y": -3393.860210917226,
+          "z": 1009
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Ginny_house",
+          "Ginny_bedroom"
+        ],
+        "location": {
+          "x": -3301.0250014086546,
+          "y": -3609.9895102516816,
+          "z": 1009
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Ginny_house",
+          "Ginny_livingRoom",
+          "Ginny_table"
+        ],
+        "location": {
+          "x": -3382.6228567159546,
+          "y": -3342.9786673618078,
+          "z": 716
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Ginny_house"
+        ],
+        "location": {
+          "x": -2929,
+          "y": -3772,
+          "z": 646
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Hash_house",
+          "Hash_livingRoom"
+        ],
+        "location": {
+          "x": -2793.36502181075,
+          "y": -4930.826348478705,
+          "z": 715
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Hash_house",
+          "Hash_balcony"
+        ],
+        "location": {
+          "x": -2860.7189321886594,
+          "y": -5117.096182407408,
+          "z": 976
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Hash_house",
+          "Hash_bedroom",
+          "Hash_desk"
+        ],
+        "location": {
+          "x": -3232.3533046165985,
+          "y": -4575.542959079142,
+          "z": 1009
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Hash_house",
+          "Hash_bedroom",
+          "Hash_bed"
+        ],
+        "location": {
+          "x": -2902.7906420824434,
+          "y": -4410.896514150365,
+          "z": 1009
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Hash_house",
+          "Hash_bedroom"
+        ],
+        "location": {
+          "x": -2824.1260215727434,
+          "y": -4627.025821336164,
+          "z": 1009
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Hash_house",
+          "Hash_livingRoom",
+          "Hash_table"
+        ],
+        "location": {
+          "x": -3058.2648656192996,
+          "y": -4474.933737084849,
+          "z": 716
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Hash_house"
+        ],
+        "location": {
+          "x": -2435,
+          "y": -4512,
+          "z": 646
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Eve_house",
+          "Eve_livingRoom"
+        ],
+        "location": {
+          "x": -1736.5130067207701,
+          "y": -5333.739922039353,
+          "z": 715
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Eve_house",
+          "Eve_balcony"
+        ],
+        "location": {
+          "x": -1637.116296592667,
+          "y": -5505.067953214596,
+          "z": 976
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Eve_house",
+          "Eve_bedroom",
+          "Eve_desk"
+        ],
+        "location": {
+          "x": -2290.8521031656405,
+          "y": -5441.6526889545585,
+          "z": 1009
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Eve_house",
+          "Eve_bedroom",
+          "Eve_bed"
+        ],
+        "location": {
+          "x": -2205.139796201388,
+          "y": -5083.360348637809,
+          "z": 1009
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Eve_house",
+          "Eve_bedroom"
+        ],
+        "location": {
+          "x": -1989.010499585726,
+          "y": -5162.024997168539,
+          "z": 1009
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Eve_house",
+          "Eve_livingRoom",
+          "Eve_table"
+        ],
+        "location": {
+          "x": -2256.0213443490397,
+          "y": -5243.62284679646,
+          "z": 716
+        }
+      },
+      {
+        "namesId": [
+          "destination",
+          "village",
+          "Eve_house"
+        ],
+        "location": {
+          "x": -1827,
+          "y": -4790,
+          "z": 646
+        }
+      }
+    ]
+  }

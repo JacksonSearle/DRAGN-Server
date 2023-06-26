@@ -3,14 +3,37 @@ import time
 from game import Game
 # import cProfile
 
+def update_world_tree():
+    with open('world_tree.json', 'r') as file: places = json.load(file)
+    with open('game_info/on_startup.json', 'r') as file: newLocations = json.load(file)
+    for place in newLocations['allDestinations']:
+        layer = places
+        for n in range(len(place['namesId'])-1):
+            if 'name' not in layer: 
+                layer['name'] = place['namesId'][n]
+                layer['position'] = None
+                layer['children'] = []
+            layer = layer['children']
+
+            found = False
+            for c in layer:
+                if c['name'] == place['namesId'][n+1]: 
+                    layer = layer[layer.index(c)]
+                    found = True
+            if not found: 
+                layer.append({})
+                layer = layer[-1]
+            
+        layer['name'] = place['namesId'][-1]
+        layer['position'] = list(place['location'].values())
+        if 'children' not in layer: layer['children'] = []
+    
+    with open('world_tree.json', 'w') as file: json.dump(places, file)
 
 def gather_initial_data(game):
     # Give original json to client
     data = game.initial_json()
-
-    # Writing initial data to a JSON file
-    with open('game_info/to_client.json', 'w') as file:
-        json.dump(data, file)
+    with open('game_info/to_client.json', 'w') as file: json.dump(data, file)
     return data
 
 def update_server_info(i, game):
@@ -41,6 +64,7 @@ def send_server_info(i, data, game, game_states):
 def main():
     game_states = 60 # number of time steps
     time_step = 60 # seconds
+    update_world_tree()
     game = Game(time_step=time_step)
     data = gather_initial_data(game)
 
