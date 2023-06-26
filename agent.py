@@ -108,8 +108,8 @@ class Agent:
         self.plan_next(time)  
 
     def plan_next(self,time):
-        hourplan = '{self.name}\'s plan this hour: ' + self.hourplans[-1]
-        status = '{self.name}\'s status right now: '+ self.status
+        hourplan = f'{self.name}\'s plan this hour: ' + self.hourplans[-1]
+        status = f'{self.name}\'s status right now: '+ self.status
         query = f'Given the context above, what does {self.name} plan to do right now, and for how long? Give your answer as a json dictionary object with "plan": string and "duration": int, and make the duration either 5, 10, or 15 minutes. Describe plan in 8 words or less.'
         prompt = '\n'.join([time_prompt(time), hourplan, status, query])
         response_text = query_model(prompt)

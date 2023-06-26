@@ -63,13 +63,14 @@ def send_server_info(i, data, game, game_states):
 
 def main():
     game_states = 60 # number of time steps
-    time_step = 60 # seconds
+    time_step = 6000 # seconds
     update_world_tree()
     game = Game(time_step=time_step)
     data = gather_initial_data(game)
 
     for i in range(game_states):
         print(i)
+        print(game.time)
         update_server_info(i, game)
         send_server_info(i, data, game, game_states)
         
