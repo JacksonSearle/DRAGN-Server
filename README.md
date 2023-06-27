@@ -3,3 +3,5 @@ This is an implementation (in progress currently) of Stanford's paper "Generativ
 Run main.py to run the server. If there is no game frontend, run move.py to simulate a frontend moving each of the NPC's.
 
 If you are using chatgpt, type this into your terminal so it works: "export OPENAI_API_KEY=<API_KEY>" where <API_KEY> is your actual API key. This will keep your API key seperate from the repository as it will only exist on your system.
+
+At this point, the system does work. It is very very simmilar to what Stanford described in their paper linked above. It makes a lot of API calls and takes a while, but we are working on making it more efficient in the future.
