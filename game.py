@@ -156,12 +156,6 @@ class Game:
         if not location.children: return location
         return self.choose_location(agent,location)
 
-    def update(self, data):
-        for i, agent in enumerate(self.agents):
-            data['agents'][i]['status'] = agent.status
-            data['agents'][i]['destination'] = agent.destination
-            data['agents'][i]['conversation'] = agent.conversation
-
     def conversation(self, agent, other_agent):
         # Every conversation will be 5 minutes
         agent.busy_time = 5 * 60
