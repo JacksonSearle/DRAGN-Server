@@ -50,6 +50,12 @@ class Game:
             )
 
 
+    def update(self, data):
+        for i, agent in enumerate(self.agents):
+            data['agents'][i]['status'] = agent.status
+            data['agents'][i]['destination'] = agent.destination
+            data['agents'][i]['conversation'] = agent.conversation
+
     def update_agents(self):
         self.time = increase_time(self.time, self.time_step)
         for agent in self.agents:
