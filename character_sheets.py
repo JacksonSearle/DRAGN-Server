@@ -3,7 +3,7 @@ character_sheets = [
         'name': 'Frank',
         'age': 41,
         'position': {"x": -394, "y": -3747, "z": 716},
-        'vision_radius': 450,
+        'vision_radius': 10,
         'waking_hours': {"up": 730, "down": 2200},
         'innate_traits': 'friendly, outgoing, hospitable',
         'seed_memories': 'is a traveling salesman stopping by the town; wants to be a tourist and efficiently visit every location in the town'
@@ -15,7 +15,7 @@ character_sheets = [
         'vision_radius': 3,
         'waking_hours': {"up": 700, "down": 2300},
         'innate_traits':'friendly, outgoing, hospitable',
-        'seed_memories': 'enjoys going fishing; reads the news a lot; enjoys investing in stocks; married to Alice; Has lived in the town far a few years; Wants to visit Hash'
+        'seed_memories': 'enjoys going fishing; reads the news a lot; enjoys investing in stocks; is married to Alice; has lived in the town for a few years; wants to visit Hash'
     },
     {
         'name': 'Alice',
@@ -24,7 +24,7 @@ character_sheets = [
         'vision_radius': 3,
         'waking_hours': {"up": 700, "down": 2215},
         'innate_traits': 'friendly, outgoing, hospitable',
-        'seed_memories': 'loves to go swimming; likes to cook new foods; married to Bob; Has lived in the town for a few years; Wants to visit Hash'
+        'seed_memories': 'loves to go swimming; likes to cook new foods; is married to Bob; has lived in the town for a few years; wants to visit Hash'
     },
     {
         'name': 'Claire',
@@ -33,7 +33,7 @@ character_sheets = [
         'vision_radius': 3,
         'waking_hours': {"up": 700, "down": 2215},
         'innate_traits': 'friendly, outgoing, hospitable',
-        'seed_memories': 'married to Doug; likes to cook new foods; married to Bob; Has lived in the town for a few years; Wants to visit Hash'
+        'seed_memories': 'married to Doug; likes to visit the library together with Doug; has lived in town since its founding; has a grandson Bob'
     },
     {
         'name': 'Doug',
@@ -42,7 +42,7 @@ character_sheets = [
         'vision_radius': 3,
         'waking_hours': {"up": 700, "down": 2215},
         'innate_traits': 'friendly, outgoing, hospitable',
-        'seed_memories': 'married to Claire; likes to cook new foods; married to Bob; Has lived in the town for a few years; Wants to visit Hash'
+        'seed_memories': 'married to Claire; likes to visit the library together with Doug; has lived in town since its founding; has a grandson Bob'
     },
     {
         'name': 'Eve',
@@ -51,7 +51,7 @@ character_sheets = [
         'vision_radius': 3,
         'waking_hours': {"up": 700, "down": 2215},
         'innate_traits': 'friendly, outgoing, hospitable',
-        'seed_memories': 'Is a librarian; knows about the surrounding geography, towns, etc; enjoys participating in Ginny\'s plays'
+        'seed_memories': 'is a librarian; knows about the surrounding geography, towns, etc; enjoys participating in Ginny\'s plays'
     },
     {
         'name': 'Ginny',
@@ -69,7 +69,7 @@ character_sheets = [
         'vision_radius': 3,
         'waking_hours': {"up": 700, "down": 2215},
         'innate_traits': 'friendly, outgoing, hospitable',
-        'seed_memories': 'is an explorer; wants to make a map of the region; he is visiting the town after injuring his leg; He doesn\'t move much; wants to study the library'
+        'seed_memories': 'is an explorer; wants to make a map of the region; is visiting the town after injuring his leg; doesn\'t move much; wants to study the library'
     },
     {
         'name': 'Irene',
@@ -87,6 +87,6 @@ character_sheets = [
         'vision_radius': 3,
         'waking_hours': {"up": 700, "down": 2215},
         'innate_traits': 'friendly, outgoing, hospitable',
-        'seed_memories': 'is the handyman; spends most of his time at the shop waiting for jobs to come in; Lost his mother to the witch Irene; Finds eace in Ginny\'s music'
+        'seed_memories': 'is the handyman; spends most of his time at the shop waiting for jobs to come in; lost his mother to the witch Irene; finds peace in Ginny\'s music'
     },
 ]

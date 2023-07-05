@@ -56,7 +56,7 @@ class Agent:
     def prep_seeds(self, time):
         seeds = self.seed_memories.split(';')
         for seed in seeds:
-            description = self.name + ' ' + seed
+            description = self.name + seed
             memory = Memory(time, description)
             self.memory_stream.append(memory)
 
