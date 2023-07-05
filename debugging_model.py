@@ -45,3 +45,4 @@ def model(messages):
         return json_string
     elif messages[1]["content"][-1] == '?':
         return f'{{"continue_conversation": true, "response": "Something interesting"}}'
+    else: return '{"react": true, "interact": "do something", "duration": 5}'

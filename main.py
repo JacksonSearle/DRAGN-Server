@@ -1,11 +1,14 @@
 import json
 import time
 from game import Game
+from pathlib import Path
 # import cProfile
+#from init_unreal import content_path
+import global_path
 
 def update_world_tree():
-    with open('world_tree.json', 'r') as file: places = json.load(file)
-    with open('game_info/on_startup.json', 'r') as file: newLocations = json.load(file)
+    with open(Path(global_path.path + 'world_tree.json'), 'r') as file: places = json.load(file)
+    with open(Path(global_path.path + 'game_info/on_startup.json'), 'r') as file: newLocations = json.load(file)
     for place in newLocations['allDestinations']:
         layer = places
         for n in range(len(place['namesId'])-1):
@@ -28,17 +31,17 @@ def update_world_tree():
         layer['position'] = list(place['location'].values())
         if 'children' not in layer: layer['children'] = []
     
-    with open('world_tree.json', 'w') as file: json.dump(places, file)
+    with open(Path(global_path.path + 'world_tree.json'), 'w') as file: json.dump(places, file)
 
 def gather_initial_data(game):
     # Give original json to client
     data = game.initial_json()
-    with open('game_info/to_client.json', 'w') as file: json.dump(data, file)
+    with open(Path(global_path.path + 'game_info/to_client.json'), 'w') as file: json.dump(data, file)
     return data
 
 def update_server_info(i, game):
     # Reading a JSON file
-    with open('game_info/to_server.json', 'r') as file:
+    with open(Path(global_path.path + 'game_info/to_server.json'), 'r') as file:
         c_data = json.load(file)
     c_agents = c_data['agents']
 
@@ -58,15 +61,21 @@ def send_server_info(i, data, game, game_states):
     game.update(data)
 
     # Writing to a JSON file
-    with open('game_info/to_client.json', 'w') as file:
+    with open(Path(global_path.path + 'game_info/to_client.json'), 'w') as file:
         json.dump(data, file)
 
 def main():
-    game_states = 20 # number of time steps
-    time_step = 600 # seconds
+    game_states = 60 # number of time steps
+    time_step = 6000 # seconds
     update_world_tree()
     game = Game(time_step=time_step)
     data = gather_initial_data(game)
+
+    # i = int(state)
+    # print(i)
+    # print(game.time)
+    # update_server_info(i, game)
+    # send_server_info(i, data, game, game_states)
 
     for i in range(game_states):
         print(i)
@@ -75,8 +84,8 @@ def main():
         send_server_info(i, data, game, game_states)
         
         # Delay the specified time
-        # time.sleep(1)
-
+        # time.sleep(1)​
+    
     print('Done with simulation')
 
 main()

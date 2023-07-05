@@ -5,7 +5,10 @@ import json
 import time
 from dotenv import load_dotenv
 
-load_dotenv()
+#from init_unreal import content_path
+import global_path
+openai.api_key_path = (global_path.path + ".env")
+load_dotenv(global_path.path)
 # Maximum number of API calls per day
 MAX_API_CALLS = 1000
 
@@ -41,7 +44,7 @@ def query_model(prompt):
 
 def model(messages):
     # Load or initialize the count and date
-    filename = 'prompts/api_calls.json'
+    filename = global_path.path + 'prompts/api_calls.json'
     if os.path.isfile(filename):
         with open(filename, 'r') as f:
             data = json.load(f)
@@ -80,7 +83,6 @@ def model(messages):
 
     else:
         print(f"API call limit of {MAX_API_CALLS} per day reached. Please wait until tomorrow.")
-
 
 # EXAMPLE USAGE
 

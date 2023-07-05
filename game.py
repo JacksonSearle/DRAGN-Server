@@ -1,4 +1,5 @@
 from util import *
+from pathlib import Path
 import json
 from agent import Agent
 from memory import Memory
@@ -10,11 +11,14 @@ if config.MODE == 'debugging':
 elif config.MODE == 'testing':
     from testing_model import query_model  # Import for testing mode
 
+import global_path
+#from init_unreal import content_path
+
 class Game:
     def __init__(self, time_step):
         self.time_step = time_step
         self.time = set_start_time(2023, 5, 24, 7, 0, 0)
-        with open('world_tree.json', 'r') as file:
+        with open(Path(global_path.path + 'world_tree.json'), 'r') as file:
             self.root = build_tree(json.load(file))
         self.places = get_all_nodes(self.root) # These are all visitable places
         self.agents = self.make_agents()
@@ -48,7 +52,6 @@ class Game:
                     'destination': agent.destination
                 }
             )
-
 
     def update(self, data):
         for i, agent in enumerate(self.agents):

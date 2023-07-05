@@ -1,1 +1,1 @@
-MODE = 'debugging'  # or 'testing'
+MODE = 'testing'  # or 'testing'
