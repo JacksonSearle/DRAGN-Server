@@ -33,6 +33,7 @@ class Agent:
 
         self.destination = None
         self.status = 'idle'
+        self.last_observed = {}
         self.object = None
         self.conversation = None
         self.summary_description = None
@@ -210,34 +211,27 @@ class Agent:
 
         return dictionary['react'], dictionary['interact']
     
-    def respond(self, dialogue_history, other_agent, current_time):
+    def converse(self, other_agent, current_time):
         recent_memory = self.memory_stream[-1]
         relevant_memories = self.retrieve_memories(current_time, recent_memory.description)
-        relevant_memories = f'Here is the dialogue history: {[memory.description for memory in relevant_memories]}'
-        if len(dialogue_history) == 0:
-            conditional_context = self.status
-        else:
-            conditional_context = dialogue_history
-        question = f'What (if anything) should {self.name} say to {other_agent.name}? Give your response as a JSON object with two fields, response: str, and continue_conversation: bool.'
+        other_memories = other_agent.retrieve_memories(current_time, other_agent.memory_stream[-1].description)
+        relevant_memories = f'{self.name} remembers the following: {[memory.description for memory in relevant_memories]}'
+        other_memories = f'{other_agent.name} remembers the following: {[m.description for m in other_memories]}'
+        question = f'What should {self.name} and {other_agent.name} say to each other? Give your response as a JSON object with one field, conversation: str.'
         prompt = '\n'.join([
             self.summary_description,
             time_prompt(current_time),
             recent_memory.format_description(),
             relevant_memories,
-            conditional_context,
+            other_memories,
+            f'{self.name}\'s status is: {self.status}',
             question
         ])
         response_text = query_model(prompt)
         response_text = brackets(response_text)
         # Parse continue_conversation and response, then return that
-        try:
-            dictionary = json.loads(response_text)
-        except:
-            dictionary = {
-                'continue_conversation': False,
-                'response': 'none'
-            }
-            print('Conversation ended preemptively')
-        return dictionary['continue_conversation'], dictionary['response']
+        try: dictionary = json.loads(response_text)
+        except: dictionary = {'conversation': f'{self.name}: Hey.\n{other_agent.name}: Hey.'}
+        return dictionary['conversation']
 
     

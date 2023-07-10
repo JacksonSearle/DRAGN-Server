@@ -6,7 +6,7 @@ character_sheets = [
         'vision_radius': 10,
         'waking_hours': {"up": 730, "down": 2200},
         'innate_traits': 'friendly, outgoing, hospitable',
-        'seed_memories': 'is a traveling salesman stopping by the town; wants to be a tourist and efficiently visit every location in the town'
+        'seed_memories': ' is a traveling salesman stopping by the town; wants to be a tourist and efficiently visit every location in the town'
     },
     {
         'name': 'Bob',
@@ -15,7 +15,7 @@ character_sheets = [
         'vision_radius': 3,
         'waking_hours': {"up": 700, "down": 2300},
         'innate_traits':'friendly, outgoing, hospitable',
-        'seed_memories': 'enjoys going fishing; reads the news a lot; enjoys investing in stocks; is married to Alice; has lived in the town for a few years; wants to visit Hash'
+        'seed_memories': ' enjoys going fishing; reads the news a lot; enjoys investing in stocks; is married to Alice; has lived in the town for a few years; wants to visit Hash'
     },
     {
         'name': 'Alice',
@@ -24,7 +24,7 @@ character_sheets = [
         'vision_radius': 3,
         'waking_hours': {"up": 700, "down": 2215},
         'innate_traits': 'friendly, outgoing, hospitable',
-        'seed_memories': 'loves to go swimming; likes to cook new foods; is married to Bob; has lived in the town for a few years; wants to visit Hash'
+        'seed_memories': ' loves to go swimming; likes to cook new foods; is married to Bob; has lived in the town for a few years; wants to visit Hash'
     },
     {
         'name': 'Claire',
@@ -33,7 +33,7 @@ character_sheets = [
         'vision_radius': 3,
         'waking_hours': {"up": 700, "down": 2215},
         'innate_traits': 'friendly, outgoing, hospitable',
-        'seed_memories': 'married to Doug; likes to visit the library together with Doug; has lived in town since its founding; has a grandson Bob'
+        'seed_memories': ' is married to Doug; likes to visit the library together with Doug; has lived in town since its founding; has a grandson Bob'
     },
     {
         'name': 'Doug',
@@ -42,7 +42,7 @@ character_sheets = [
         'vision_radius': 3,
         'waking_hours': {"up": 700, "down": 2215},
         'innate_traits': 'friendly, outgoing, hospitable',
-        'seed_memories': 'married to Claire; likes to visit the library together with Doug; has lived in town since its founding; has a grandson Bob'
+        'seed_memories': ' is married to Claire; likes to visit the library together with Doug; has lived in town since its founding; has a grandson Bob'
     },
     {
         'name': 'Eve',
@@ -51,7 +51,7 @@ character_sheets = [
         'vision_radius': 3,
         'waking_hours': {"up": 700, "down": 2215},
         'innate_traits': 'friendly, outgoing, hospitable',
-        'seed_memories': 'is a librarian; knows about the surrounding geography, towns, etc; enjoys participating in Ginny\'s plays'
+        'seed_memories': ' is a librarian; knows about the surrounding geography, towns, etc; enjoys participating in Ginny\'s plays'
     },
     {
         'name': 'Ginny',
@@ -60,7 +60,7 @@ character_sheets = [
         'vision_radius': 3,
         'waking_hours': {"up": 700, "down": 2215},
         'innate_traits': 'friendly, outgoing, hospitable',
-        'seed_memories': 'is the local storyteller and musician; has a daily show at the square; sometimes invites others to join in as actors for a play; has an uncle named Bob'
+        'seed_memories': ' is the local storyteller and musician; has a daily show at the square; sometimes invites others to join in as actors for a play; has an uncle named Bob'
     },
     {
         'name': 'Hash',
@@ -69,7 +69,7 @@ character_sheets = [
         'vision_radius': 3,
         'waking_hours': {"up": 700, "down": 2215},
         'innate_traits': 'friendly, outgoing, hospitable',
-        'seed_memories': 'is an explorer; wants to make a map of the region; is visiting the town after injuring his leg; doesn\'t move much; wants to study the library'
+        'seed_memories': ' is an explorer; wants to make a map of the region; is visiting the town after injuring his leg; doesn\'t move much; wants to study the library'
     },
     {
         'name': 'Irene',
@@ -78,7 +78,7 @@ character_sheets = [
         'vision_radius': 3,
         'waking_hours': {"up": 700, "down": 2215},
         'innate_traits': 'friendly, outgoing, hospitable',
-        'seed_memories': 'is the local witch; lives outside of town; has had a grudge against Claire for years; still has not cursed Claire'
+        'seed_memories': ' is the local witch; lives outside of town; has had a grudge against Claire for years; still has not cursed Claire'
     },
     {
         'name': 'Joseph',
@@ -87,6 +87,6 @@ character_sheets = [
         'vision_radius': 3,
         'waking_hours': {"up": 700, "down": 2215},
         'innate_traits': 'friendly, outgoing, hospitable',
-        'seed_memories': 'is the handyman; spends most of his time at the shop waiting for jobs to come in; lost his mother to the witch Irene; finds peace in Ginny\'s music'
+        'seed_memories': ' is the handyman; spends most of his time at the shop waiting for jobs to come in; lost his mother to the witch Irene; finds peace in Ginny\'s music'
     },
 ]

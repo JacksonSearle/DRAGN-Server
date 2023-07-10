@@ -1,4 +1,5 @@
 from util import *
+from multiprocessing import Pool
 from pathlib import Path
 import json
 from agent import Agent
@@ -20,9 +21,9 @@ class Game:
         self.time = set_start_time(2023, 5, 24, 7, 0, 0)
         with open(Path(global_path.path + 'world_tree.json'), 'r') as file:
             self.root = build_tree(json.load(file))
-        self.places = get_all_nodes(self.root) # These are all visitable places
+        self.places = get_all_nodes(self.root)
         self.agents = self.make_agents()
-        self.make_agent_info()
+        #self.make_agent_info()
 
     def initial_json(self):
         data = {}
@@ -49,7 +50,7 @@ class Game:
                 {
                     'name': agent.name,
                     'position': [agent.x, agent.y],
-                    'destination': agent.destination
+                    'destination': agent.destination 
                 }
             )
 
@@ -61,8 +62,8 @@ class Game:
 
     def update_agents(self):
         self.time = increase_time(self.time, self.time_step)
-        for agent in self.agents:
-            self.update_agent(agent)
+        with Pool(processes=10) as pool:
+            pool.map(self.update_agent, self.agents)
 
     def update_agent(self, agent):
         self.perceive_objects(agent)
@@ -81,23 +82,27 @@ class Game:
             else: agent.busy_time -= self.time_step
 
     def perceive_objects(self,agent):
+        #TODO: Front-end determines the objects seen by the agent
         for place in self.places:
             if agent.is_within_range(place.x, place.y, place.z):
-                # Make an observation for that thing
-                description = f'{place.name} is {place.state}'
-                memory = Memory(self.time, description)
-                agent.add_memory(memory)
-                # Choose whether or not to react to each observation
-                react, interact = agent.react(self.time, memory)
-                if react: 
-                    agent.status = interact
-                    self.execute_plan(agent)
+                # Make an observation for that thing if its state is different or newly observed
+                if place.name not in agent.last_observed or agent.last_observed[place.name] != place.state:
+                    agent.last_observed[place.name] = place.state
+                    description = f'{place.name} is {place.state}'
+                    memory = Memory(self.time, description)
+                    agent.add_memory(memory)
+                    # Choose whether or not to react to each observation
+                    react, interact = agent.react(self.time, memory)
+                    if react: 
+                        agent.status = interact
+                        self.execute_plan(agent)
     
     def perceive_agents(self,agent):
         for j, other_agent in enumerate(self.agents):
             # Make sure an agent isn't talking to themselves
             if agent is not other_agent and agent.is_within_range(other_agent.x, other_agent.y, other_agent.z):
-                # Make both agents see eachother
+                # Make both agents see each other
+                #TODO: prompts do not consistently produce statuses that fit with this sentence structure, e.g "Bob is check on Alice", "Alice is Alice would chat"
                 description = f'{other_agent.name} is {other_agent.status}'
                 memory = Memory(self.time, description)
                 agent.memory_stream.append(memory)
@@ -119,22 +124,18 @@ class Game:
         if agent.object: agent.object.state = "idle"
         agent.object = self.choose_location(agent)
         prompt = f'{agent.name} is {agent.status} at the {agent.object.name}. Generate a JSON dictionary object with a single field, "state": string, which describes the state the {agent.object.name} is in.'
-        response_text = query_model(prompt)
-        # Extract the contents between the brackets
-        response_text = brackets(response_text)
-        # TODO: Ensure it's a json or reprompt
-        if response_text == 'error':
-            agent.object.state = 'error'
-            print('error in executing plan')
-        else:
-            agent.object.state = json.loads(response_text)['state']
+        response_text = 'error'
+        while response_text == 'error':
+            response_text = query_model(prompt)
+            response_text = brackets(response_text)
+        agent.object.state = json.loads(response_text)['state']
         agent.destination = {"x":agent.object.x, "y":agent.object.y, "z":agent.object.z}
     
     def choose_location(self,agent,root=None):
+        #TODO: Perhaps we should check if the current location of the agent is already reasonable enough to do the next task?
         if not root: root = self.root
         choices = ''
         for c in range(len(root.children)): 
-            # This is one indexed
             s = f'{c+1}: {root.children[c].name}'
             choices = '\n'.join([choices,s])
         query = f'Given the place(s) above, write a JSON dictionary object with "choice": int. Choice should be one of the indexes shown above. Make its value the index of the place which is the most reasonable for {agent.name} to do the following activity: {agent.status}'
@@ -142,19 +143,13 @@ class Game:
         response_text = 'error'
         while response_text == 'error':
             response_text = query_model(prompt)
-            # TODO: Ensure it's a json or reprompt
-            # Extract the contents between the brackets
             response_text = brackets(response_text)
         dictionary = json.loads(response_text)
-        # Un-one index it
-        if 'choice' not in dictionary.keys():
-            index = 0
-            print('Choice set to default')
-        else:
-            index = dictionary['choice'] - 1
-        if index > len(root.children) - 1 or index < 0:
-            index = 0
-            print(f'Choice set to default')
+
+        if 'choice' not in dictionary.keys(): index = 0
+        else: index = dictionary['choice'] - 1
+        if index > len(root.children) - 1 or index < 0: index = 0
+
         location = root.children[index]
         if not location.children: return location
         return self.choose_location(agent,location)
@@ -163,30 +158,12 @@ class Game:
         # Every conversation will be 5 minutes
         agent.busy_time = 5 * 60
         other_agent.busy_time = 5*60
-
-        # Generate the conversation
-        dialogue_history = ""
-        continue_conversation = True
-        i = 0
-        while True:
-            continue_conversation, response = agent.respond(dialogue_history, other_agent, self.time)
-            dialogue_history += f'\n{agent.name}: {response}'
-            i += 1
-            if continue_conversation == False or i > 9:
-                break
-            continue_conversation, response = other_agent.respond(dialogue_history, agent, self.time)
-            dialogue_history += f'\n{other_agent.name}: {response}'
-            i += 1
-            if continue_conversation == False or i > 9:
-                break
-
-        # Set conversation for each agent and set destination and status to null
+        conversation = agent.converse(other_agent, self.time)
         # TODO: could we set their destination to a halfway point between the agents?
-        agent.conversation, other_agent.conversation = dialogue_history, dialogue_history
+        agent.conversation, other_agent.conversation = conversation, conversation
         agent.destination, other_agent.destination = None, None
 
-        # Put the conversation description into memory stream
-        conversation_description = self.create_conversation_description(dialogue_history)
+        conversation_description = self.create_conversation_description(conversation)
         shared_memory = Memory(self.time, conversation_description)
         agent.add_memory(shared_memory)
         other_agent.add_memory(shared_memory)
