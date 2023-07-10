@@ -66,15 +66,15 @@ class Game:
             pool.map(self.update_agent, self.agents)
 
     def update_agent(self, agent):
-        self.perceive_objects(agent)
-        self.perceive_agents(agent)
-        #Call day plan if agent is just waking up, call reflection if agent is going to bed, or call hour/minute plans if during waking hours
         timeofday = get_timeofday(self.time)
         if timeofday == agent.waking_hours["up"]: 
             agent.plan_day(self.time)
             self.execute_plan(agent)
+        #Call reflection if agent is going to bed, or call hour/minute plans if during waking hours
         elif timeofday == agent.waking_hours["down"]: agent.reflect(self.time)
         elif agent.waking_hours["up"] < timeofday < agent.waking_hours["down"]:
+            if not self.perceive_objects(agent):
+                self.perceive_agents(agent)
             if agent.busy_time <= 0:
                 if timeofday%100 == 0: agent.plan_hour(self.time)
                 else: agent.plan_next(self.time)
@@ -82,6 +82,8 @@ class Game:
             else: agent.busy_time -= self.time_step
 
     def perceive_objects(self,agent):
+        perceived = []
+        choices = []
         #TODO: Front-end determines the objects seen by the agent
         for place in self.places:
             if agent.is_within_range(place.x, place.y, place.z):
@@ -91,11 +93,15 @@ class Game:
                     description = f'{place.name} is {place.state}'
                     memory = Memory(self.time, description)
                     agent.add_memory(memory)
-                    # Choose whether or not to react to each observation
-                    react, interact = agent.react(self.time, memory)
-                    if react: 
-                        agent.status = interact
-                        self.execute_plan(agent)
+                    perceived.append(memory)
+                    choices.append(place)
+        # Choose whether or not to react to each observation
+        react, interact = agent.react(self.time, perceived)
+        if react!=-1: 
+            agent.status = interact
+            self.execute_plan(agent, choices[react])
+            return True
+        return False
     
     def perceive_agents(self,agent):
         for j, other_agent in enumerate(self.agents):
@@ -120,9 +126,10 @@ class Game:
                     self.conversation(agent, other_agent)
 
     
-    def execute_plan(self,agent):
+    def execute_plan(self,agent,object=None):
         if agent.object: agent.object.state = "idle"
-        agent.object = self.choose_location(agent)
+        if object: agent.object = object
+        else: agent.object = self.choose_location(agent)
         prompt = f'{agent.name} is {agent.status} at the {agent.object.name}. Generate a JSON dictionary object with a single field, "state": string, which describes the state the {agent.object.name} is in.'
         response_text = 'error'
         while response_text == 'error':
@@ -138,7 +145,7 @@ class Game:
         for c in range(len(root.children)): 
             s = f'{c+1}: {root.children[c].name}'
             choices = '\n'.join([choices,s])
-        query = f'Given the place(s) above, write a JSON dictionary object with "choice": int. Choice should be one of the indexes shown above. Make its value the index of the place which is the most reasonable for {agent.name} to do the following activity: {agent.status}'
+        query = f'Given the place(s) above, write a JSON dictionary object with "choice": int. Choice should be one of the indices shown above. Make its value the index of the place which is the most reasonable for {agent.name} to do the following activity: {agent.status}'
         prompt = '\n'.join([choices, query])
         response_text = 'error'
         while response_text == 'error':

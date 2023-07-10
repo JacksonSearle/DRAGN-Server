@@ -42,7 +42,7 @@ character_sheets = [
         'vision_radius': 3,
         'waking_hours': {"up": 700, "down": 2215},
         'innate_traits': 'friendly, outgoing, hospitable',
-        'seed_memories': ' is married to Claire; likes to visit the library together with Doug; has lived in town since its founding; has a grandson Bob'
+        'seed_memories': ' is married to Claire; likes to visit the library together with Claire; has lived in town since its founding; has a grandson Bob'
     },
     {
         'name': 'Eve',

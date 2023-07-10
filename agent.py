@@ -188,28 +188,28 @@ class Agent:
     def format_status(self):
         return f'{self.name}\'s status: {self.status}'
     
-    def react(self, current_time, memory):
+    def react(self, current_time, memories):
         # Generate prompt
-        memories = self.retrieve_memories(current_time, memory.description)
+        relevant = [self.retrieve_memories(current_time, m.description, k=3) for m in memories]
+        relevant_context = f'{self.name} has observed the following:\n'
+        for i in range(len(memories)): relevant_context += f'{i+1}: {memories[i].description}\n'
         relevant_context = "Relevant Context:\n"
-        relevant_context += '\n'.join([memory.description for memory in memories])
-        question = f'Based on the context above, give a json dictionary object with "react": bool, "interact": string and "duration": int. The react bool will show if {self.name} should react to the observation. The interact string will show how {self.name} would interact to the observation. The duration int shows how long {self.name} would interact with that object. Duration should be in minutes, somewhere between 5 and 15 minutes. If the observation is that something is idle, do not react.'
-        prompt = '\n'.join([self.summary_description, time_prompt(current_time), self.format_status(), memory.format_description(), relevant_context, question])
-        response_text = query_model(prompt)
+        relevant_context += '\n'.join([m.description for rel in relevant for m in rel])
 
+        question = f'Based on the context above, give a json dictionary object with "choice": int, "interact": string, and "duration": int. Choice should be one of the indices shown above, or -1. Make its value the index of the observation which {self.name} should react to (or -1 for no reaction). The interact string will describe how {self.name} interacts to the chosen observation. The duration int shows how long {self.name} interacts with that object. Duration should be in minutes, somewhere between 5 and 15 minutes.'
+        prompt = '\n'.join([self.summary_description, time_prompt(current_time), self.format_status(), relevant_context, question])
+        response_text = query_model(prompt)
         # TODO: Ensure it's a json or reprompt
-        
-        # Parse output to json
         response_text = brackets(response_text)
         dictionary = json.loads(response_text)
 
-        if dictionary['react']:
-            self.status = dictionary['interact']
-            self.duration = dictionary['duration'] * 60
-        else:
-            dictionary['interact'] = ""
-
-        return dictionary['react'], dictionary['interact']
+        if 'choice' not in dictionary.keys(): index = -1
+        else: index = dictionary['choice'] - 1
+        if index >= len(memories) or index < 0: return -1, False
+        
+        self.status = dictionary['interact']
+        self.busy_time = dictionary['duration'] * 60
+        return dictionary['choice'], dictionary['interact']
     
     def converse(self, other_agent, current_time):
         recent_memory = self.memory_stream[-1]
