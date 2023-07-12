@@ -35,6 +35,7 @@ def prompt_until_success(prompt, expected_structure):
     while not valid_json(response_text, expected_structure):
         response_text = query_model(prompt, expected_structure)
     dictionary = json.loads(response_text)
+    return dictionary
 
 def format_time(curr_time):
     formatted_time = time.strftime("%Y-%m-%d %H:%M:%S", curr_time)

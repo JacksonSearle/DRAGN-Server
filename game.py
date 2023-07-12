@@ -45,8 +45,10 @@ class Game:
 
     def update_agents(self):
         self.time = increase_time(self.time, self.time_step)
-        with Pool(processes=10) as pool:
-            pool.map(self.update_agent, self.agents)
+        for agent in self.agents:
+            self.update_agent(agent)
+        # with Pool(processes=10) as pool:
+        #     pool.map(self.update_agent, self.agents)
         
 
     def update_agent(self, agent):
@@ -100,7 +102,7 @@ class Game:
                 agent.memory_stream.append(memory)
                 
                 # Choose whether or not to react to each observation
-                react, interact = agent.react(self.time, memory)
+                react, interact = agent.react(self.time, [memory])
                 if react:
                     agent.status = interact
                     # make a memory for the person they are talking to
@@ -164,6 +166,9 @@ class Game:
         other_agent.add_memory(shared_memory)
     
     def create_conversation_description(self, dialogue_history):
-        message = f'Generate a one sentence description of the following dialogue history:\n {dialogue_history}'
-        response_text = query_model(message)
-        return response_text
+        message = f'Generate a one sentence description of the following dialogue history:\n {dialogue_history}\n\nReturn a json object with one field "description": str'
+        expected_structure = {
+            "description": str
+        }
+        dictionary = prompt_until_success(message, expected_structure)
+        return dictionary["description"]

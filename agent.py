@@ -88,19 +88,25 @@ class Agent:
         return self.summary_description_prompt(time, 'day', 50)
 
     def plan_day(self,time):
-        query = f'It is {format_time(time)}. What are {self.name}\'s plans today, given the following summary of what he did yesterday?'
+        query = f'It is {format_time(time)}. What are {self.name}\'s plans today, given the following summary of what he did yesterday? Return a json object with one field, "plan": str'
         prompt = '\n'.join([self.summary_description, query, self.yesterday_summary])
-        response_text = query_model(prompt)
-        self.dayplan = response_text
-        self.plan_hour(time) 
+        expected_structure = {
+            "plan": str
+        }
+        dictionary = prompt_until_success(prompt, expected_structure)
+        self.dayplan = dictionary["plan"]
+        self.plan_hour(time)
     
     def plan_hour(self,time):
         dayplan = f'{self.name}\'s daily plan: ' + self.dayplan
         lastplan = f'{self.name}\'s plan for the last hour: ' + self.hourplans[-1]
-        query = f'Given the context above, what does {self.name} plan to do this hour?'
+        query = f'Given the context above, what does {self.name} plan to do this hour? Return a json object with one field, "plan": str'
         prompt = '\n'.join([dayplan, lastplan, query])
-        response_text = query_model(prompt)
-        self.hourplans.append(response_text)
+        expected_structure = {
+            "plan": str
+        }
+        dictionary = prompt_until_success(prompt, expected_structure)
+        self.hourplans.append(dictionary["plan"])
         self.plan_next(time)  
 
     def plan_next(self,time):
@@ -126,19 +132,25 @@ class Agent:
 
     def reflect(self,time):
         relevant_context = '\n'.join([memory.description for memory in self.memory_stream[-100:]])
-        question = f'Given only the information above, what are 3 most salient high-level questions we can answer about the subjects in the statements?'
+        question = f'Given only the information above, what are 3 most salient high-level questions we can answer about the subjects in the statements? Return a json object with one field "questions": [str] with three questions in the list.'
+        expected_structure = {
+            "questions": [str]
+        }
         prompt = '\n'.join([relevant_context, question])
-        response_queries = query_model(prompt)
-        response_queries = self.find_responses(response_queries,3)
+        dictionary = prompt_until_success(prompt, expected_structure)
+        response_queries = dictionary["questions"]
 
         statements = f"Statements about {self.name}\n"
         for query in response_queries:
             memories = self.retrieve_memories(time, query)
             statements += '\n'.join([memory.description for memory in memories])
-        question = "What 5 high-level insights can you infer from the above statements?"
+        question = 'What 5 high-level insights can you infer from the above statements? Return a json object with one field "insights": [str] with five insights in the list.'
         prompt = '\n'.join([statements, question])
-        response_text = query_model(prompt)
-        response_text = self.find_responses(response_text,5)
+        expected_structure = {
+            "insights": [str]
+        }
+        dictionary = prompt_until_success(prompt, expected_structure)
+        response_text = dictionary["insights"]
         for r in response_text: self.add_memory(Memory(time, r, "Reflection"))
 
     def find_responses(self, s, i):
@@ -177,11 +189,14 @@ class Agent:
 
     def summary_description_prompt(self, time, text, k=4):
         # Generate prompt
-        query = f'How would one describe {self.name}\'s {text} given the following statements?'
+        query = f'How would one describe {self.name}\'s {text} given the following statements? Return a json with one field "description": str'
         memories = self.retrieve_memories(time, query, k)
         prompt = '\n'.join([query] + [memory.description for memory in memories])
-        response_text = query_model(prompt)
-        return response_text
+        expected_structure = {
+            "description": str
+        }
+        dictionary = prompt_until_success(prompt, expected_structure)
+        return dictionary["description"]
 
     def format_status(self):
         return f'{self.name}\'s status: {self.status}'
