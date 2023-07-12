@@ -1,13 +1,40 @@
 import time
+import json
+import config
 
-def brackets(response_text):
-    start_index = response_text.find('{')  # Find the index of the first opening bracket
-    end_index = response_text.rfind('}')  # Find the index of the last closing bracket
-    if start_index == -1 or end_index == -1:
-        response_text = "error"  # Return None if either bracket is not found
-    else:
-        response_text = response_text[start_index:end_index + 1]
-    return response_text
+if config.MODE == 'debugging':
+    from debugging_model import query_model  # Import for debugging mode
+elif config.MODE == 'testing':
+    from testing_model import query_model  # Import for testing mode
+
+def valid_json(json_str, expected_structure):
+    start_index = json_str.find('{')
+    end_index = json_str.rfind('}') + 1
+    json_str = json_str[start_index:end_index]
+
+    try:
+        data = json.loads(json_str)
+    except ValueError as e:
+        return False
+
+    for key, value_type in expected_structure.items():
+        if key not in data:
+            return False, f"Missing key: {key}"
+        if isinstance(value_type, list):  # special handling for lists
+            if not isinstance(data[key], list):
+                return False, f"Incorrect type for key: {key}. Expected a list, but got {type(data[key])}."
+            if not all(isinstance(i, value_type[0]) for i in data[key]):
+                return False, f"Incorrect type for elements in key: {key}. Expected {value_type[0]}, but got different type."
+        else:  # for non-lists, we can directly use isinstance
+            if not isinstance(data[key], value_type):
+                return False, f"Incorrect type for key: {key}. Expected {value_type}, but got {type(data[key])}."
+    return True
+
+def prompt_until_success(prompt, expected_structure):
+    response_text = query_model(prompt, expected_structure)
+    while not valid_json(response_text, expected_structure):
+        response_text = query_model(prompt, expected_structure)
+    dictionary = json.loads(response_text)
 
 def format_time(curr_time):
     formatted_time = time.strftime("%Y-%m-%d %H:%M:%S", curr_time)

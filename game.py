@@ -6,11 +6,6 @@ from agent import Agent
 from memory import Memory
 from tree import get_all_nodes, build_tree
 from character_sheets import character_sheets
-import config
-if config.MODE == 'debugging':
-    from debugging_model import query_model  # Import for debugging mode
-elif config.MODE == 'testing':
-    from testing_model import query_model  # Import for testing mode
 
 import global_path
 #from init_unreal import content_path
@@ -122,11 +117,11 @@ class Game:
         if object: agent.object = object
         else: agent.object = self.choose_location(agent)
         prompt = f'{agent.name} is {agent.status} at the {agent.object.name}. Generate a JSON dictionary object with a single field, "state": string, which describes the state the {agent.object.name} is in.'
-        response_text = 'error'
-        while response_text == 'error':
-            response_text = query_model(prompt)
-            response_text = brackets(response_text)
-        agent.object.state = json.loads(response_text)['state']
+        expected_structure = {
+            "state": str,
+        }
+        dictionary = prompt_until_success(prompt, expected_structure)
+        agent.object.state = dictionary['state']
         agent.destination = {"x":agent.object.x, "y":agent.object.y, "z":agent.object.z}
     
     def choose_location(self,agent,root=None):
@@ -142,14 +137,12 @@ class Game:
             choices = '\n'.join([choices,s])
         query = f'Given the place(s) above, write a JSON dictionary object with "choice": int. Choice should be one of the indices shown above. Make its value the index of the place which is the most reasonable for {agent.name} to do the following activity: {agent.status}'
         prompt = '\n'.join([choices, query])
-        response_text = 'error'
-        while response_text == 'error':
-            response_text = query_model(prompt)
-            response_text = brackets(response_text)
-        dictionary = json.loads(response_text)
+        expected_structure = {
+            "state": str,
+        }
+        dictionary = prompt_until_success(prompt, expected_structure)
 
-        if 'choice' not in dictionary.keys(): index = 0
-        else: index = dictionary['choice'] - 1
+        index = dictionary['choice'] - 1
         if index > len(root.children) - 1 or index < 0: index = 0
 
         location = root.children[index]

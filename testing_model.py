@@ -35,7 +35,7 @@ def get_valid_response(prompt, keys, types):
             return response_dict
         # If any key is missing or has the wrong type, try again
 
-def query_model(prompt):
+def query_model(prompt, _):
     messages = [
         {"role": "system", "content": "You are a helpful assistant."},
         {"role": "user", "content": prompt}

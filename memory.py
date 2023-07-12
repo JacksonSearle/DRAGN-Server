@@ -1,13 +1,7 @@
 import re
 import json
 from util import *
-import config
 from sentence_embed import embed
-
-if config.MODE == 'debugging':
-    from debugging_model import query_model  # Import for debugging mode
-elif config.MODE == 'testing':
-    from testing_model import query_model  # Import for testing mode
 
 class Memory:
     def __init__(self, time, description, type="Observation"):
@@ -24,11 +18,11 @@ class Memory:
         output = query_model(prompt)
 
         # Turn it into a JSON
-        output = brackets(output)
-        if output == "error":
-            output = '{"importance": 5}'
-        data = json.loads(output)
-        number = data["importance"]
+        expected_structure = {
+            "importance": int,
+        }
+        dictionary = prompt_until_success(prompt, expected_structure)
+        number = dictionary["importance"]
 
         # Check out of bounds numbers
         if number > 10:
@@ -40,12 +34,3 @@ class Memory:
     
     def format_description(self):
         return f'Observation: {self.description}'
-
-def find_integer_in_string(input_string):
-    match = re.search(r'\d+', input_string)  # searches for the first contiguous integer
-    if match is not None:  # if a match is found
-        return (match.start(), match.end()-1)  # returns the starting and ending indices
-    else:
-        return None  # returns None if no integer is found
-
-    

@@ -7,12 +7,6 @@ from util import *
 from sentence_embed import embed
 from time import mktime
 from memory import Memory
-import config
-
-if config.MODE == 'debugging':
-    from debugging_model import query_model  # Import for debugging mode
-elif config.MODE == 'testing':
-    from testing_model import query_model  # Import for testing mode
 
 class Agent:
     def __init__(self, character_sheet, time):
@@ -114,11 +108,13 @@ class Agent:
         status = f'{self.name}\'s status right now: '+ self.status
         query = f'Given the context above, what does {self.name} plan to do right now, and for how long? Give your answer as a json dictionary object with "plan": string and "duration": int, and make the duration either 5, 10, or 15 minutes. Describe plan in 8 words or less.'
         prompt = '\n'.join([time_prompt(time), hourplan, status, query])
-        response_text = query_model(prompt)
-        # TODO: Ensure it's a json or reprompt
-        response_text = brackets(response_text)
-        dictionary = json.loads(response_text)
+        expected_structure = {
+            "plan": str,
+            "duration": int
+        }
+        dictionary = prompt_until_success(prompt, expected_structure)
         self.status, self.busy_time = dictionary['plan'], dictionary['duration']*60
+
     
     def end_day(self,time):
         self.yesterday_summary = self.summarize_day(set_start_time(time.tm_year,time.tm_month,time.tm_mday,0,0,0))
@@ -200,13 +196,13 @@ class Agent:
 
         question = f'Based on the context above, give a json dictionary object with "choice": int, "interact": string, and "duration": int. Choice should be one of the indices shown above, or -1. Make its value the index of the observation which {self.name} should react to (or -1 for no reaction). The interact string will describe how {self.name} interacts to the chosen observation. The duration int shows how long {self.name} interacts with that object. Duration should be in minutes, somewhere between 5 and 15 minutes.'
         prompt = '\n'.join([self.summary_description, time_prompt(current_time), self.format_status(), relevant_context, question])
-        response_text = query_model(prompt)
-        # TODO: Ensure it's a json or reprompt
-        response_text = brackets(response_text)
-        dictionary = json.loads(response_text)
-
-        if 'choice' not in dictionary.keys(): index = -1
-        else: index = dictionary['choice'] - 1
+        expected_structure = {
+            "choice": int,
+            "interact": str,
+            "duration": int,
+        }
+        dictionary = prompt_until_success(prompt, expected_structure)
+        index = dictionary['choice'] - 1
         if index >= len(memories) or index < 0: return -1, False
         
         self.status = dictionary['interact']
@@ -229,11 +225,10 @@ class Agent:
             f'{self.name}\'s status is: {self.status}',
             question
         ])
-        response_text = query_model(prompt)
-        response_text = brackets(response_text)
-        # Parse continue_conversation and response, then return that
-        try: dictionary = json.loads(response_text)
-        except: dictionary = {'conversation': f'{self.name}: Hey.\n{other_agent.name}: Hey.'}
+        expected_structure = {
+            "conversation": str,
+        }
+        dictionary = prompt_until_success(prompt, expected_structure)
         return dictionary['conversation']
 
     
