@@ -46,11 +46,12 @@ class Agent:
         # Update buffers
         self.reflect_buffer += memory.importance
         self.summary_description_buffer += memory.importance
+        reflection_threshold = 150
         # Check buffers
-        if self.reflect_buffer > 150:
+        if self.reflect_buffer > reflection_threshold:
             self.reflect_buffer = 0
             self.reflect(memory.time)
-        if self.summary_description_buffer > 40:
+        if self.summary_description_buffer > reflection_threshold * 3:
             self.summary_description_buffer = 0
             self.update_summary_description(memory.time)
 
@@ -121,6 +122,7 @@ class Agent:
     
     def end_day(self,time):
         self.yesterday_summary = self.summarize_day(set_start_time(time.tm_year,time.tm_month,time.tm_mday,0,0,0))
+        self.last_observed.clear()
         for m in self.memory_stream:
             if m.type == "Observation": self.memory_stream.remove(m)
         self.reflect(time)

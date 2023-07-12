@@ -23,7 +23,6 @@ class Game:
             self.root = build_tree(json.load(file))
         self.places = get_all_nodes(self.root)
         self.agents = self.make_agents()
-        #self.make_agent_info()
 
     def initial_json(self):
         data = {}
@@ -43,17 +42,6 @@ class Game:
             agents.append(Agent(character_sheet, self.time))
         return agents
 
-    def make_agent_info(self):
-        agents = []
-        for agent in self.agents:
-            agents.append(
-                {
-                    'name': agent.name,
-                    'position': [agent.x, agent.y],
-                    'destination': agent.destination 
-                }
-            )
-
     def update(self, data):
         for i, agent in enumerate(self.agents):
             data['agents'][i]['status'] = agent.status
@@ -64,6 +52,7 @@ class Game:
         self.time = increase_time(self.time, self.time_step)
         with Pool(processes=10) as pool:
             pool.map(self.update_agent, self.agents)
+        
 
     def update_agent(self, agent):
         timeofday = get_timeofday(self.time)
@@ -76,6 +65,7 @@ class Game:
             if not self.perceive_objects(agent):
                 self.perceive_agents(agent)
             if agent.busy_time <= 0:
+                agent.conversation = None
                 if timeofday%100 == 0: agent.plan_hour(self.time)
                 else: agent.plan_next(self.time)
                 self.execute_plan(agent)
@@ -96,11 +86,12 @@ class Game:
                     perceived.append(memory)
                     choices.append(place)
         # Choose whether or not to react to each observation
-        react, interact = agent.react(self.time, perceived)
-        if react!=-1: 
-            agent.status = interact
-            self.execute_plan(agent, choices[react])
-            return True
+        if agent.conversation == None:
+            react, interact = agent.react(self.time, perceived)
+            if react!=-1: 
+                agent.status = interact
+                self.execute_plan(agent, choices[react])
+                return True
         return False
     
     def perceive_agents(self,agent):
@@ -109,7 +100,7 @@ class Game:
             if agent is not other_agent and agent.is_within_range(other_agent.x, other_agent.y, other_agent.z):
                 # Make both agents see each other
                 #TODO: prompts do not consistently produce statuses that fit with this sentence structure, e.g "Bob is check on Alice", "Alice is Alice would chat"
-                description = f'{other_agent.name} is {other_agent.status}'
+                description = f'{other_agent.name}\'s plan is to {other_agent.status}'
                 memory = Memory(self.time, description)
                 agent.memory_stream.append(memory)
                 
@@ -139,11 +130,15 @@ class Game:
         agent.destination = {"x":agent.object.x, "y":agent.object.y, "z":agent.object.z}
     
     def choose_location(self,agent,root=None):
-        #TODO: Perhaps we should check if the current location of the agent is already reasonable enough to do the next task?
-        if not root: root = self.root
+        children = []
+        if not root: 
+            root = self.root
+            children = [agent.object]
+        children.extend(root.children)
+
         choices = ''
-        for c in range(len(root.children)): 
-            s = f'{c+1}: {root.children[c].name}'
+        for c in range(len(children)): 
+            s = f'{c+1}: {children[c].name}'
             choices = '\n'.join([choices,s])
         query = f'Given the place(s) above, write a JSON dictionary object with "choice": int. Choice should be one of the indices shown above. Make its value the index of the place which is the most reasonable for {agent.name} to do the following activity: {agent.status}'
         prompt = '\n'.join([choices, query])
