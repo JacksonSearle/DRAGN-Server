@@ -19,21 +19,23 @@ def valid_json(json_str, expected_structure):
 
     for key, value_type in expected_structure.items():
         if key not in data:
-            return False, f"Missing key: {key}"
+            return False #, f"Missing key: {key}"
         if isinstance(value_type, list):  # special handling for lists
             if not isinstance(data[key], list):
-                return False, f"Incorrect type for key: {key}. Expected a list, but got {type(data[key])}."
+                return False #, f"Incorrect type for key: {key}. Expected a list, but got {type(data[key])}."
             if not all(isinstance(i, value_type[0]) for i in data[key]):
-                return False, f"Incorrect type for elements in key: {key}. Expected {value_type[0]}, but got different type."
+                return False #, f"Incorrect type for elements in key: {key}. Expected {value_type[0]}, but got different type."
         else:  # for non-lists, we can directly use isinstance
             if not isinstance(data[key], value_type):
-                return False, f"Incorrect type for key: {key}. Expected {value_type}, but got {type(data[key])}."
+                return False #, f"Incorrect type for key: {key}. Expected {value_type}, but got {type(data[key])}."
     return True
 
 def prompt_until_success(prompt, expected_structure):
     response_text = query_model(prompt, expected_structure)
-    while not valid_json(response_text, expected_structure):
+    i = 0
+    while i < 10 and not valid_json(response_text, expected_structure):
         response_text = query_model(prompt, expected_structure)
+        i += 1
     dictionary = json.loads(response_text)
     return dictionary
 
