@@ -32,12 +32,19 @@ def valid_json(json_str, expected_structure):
 
 def prompt_until_success(prompt, expected_structure):
     response_text = query_model(prompt, expected_structure)
+    valid_answer = valid_json(response_text, expected_structure)
     i = 0
-    while i < 10 and not valid_json(response_text, expected_structure):
+    num_tries = 10
+    while i < num_tries and not valid_answer:
         response_text = query_model(prompt, expected_structure)
+        valid_answer = valid_json(response_text, expected_structure)
         i += 1
-    dictionary = json.loads(response_text)
-    return dictionary
+    if valid_answer:
+        dictionary = json.loads(response_text)
+        return dictionary
+    else:
+        print(f'ERROR: FAILED {num_tries} times\nPrompt: {prompt}')
+        return None
 
 def format_time(curr_time):
     formatted_time = time.strftime("%Y-%m-%d %H:%M:%S", curr_time)
