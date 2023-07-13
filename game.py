@@ -83,7 +83,7 @@ class Game:
                     perceived.append(memory)
                     choices.append(place)
         # Choose whether or not to react to each observation
-        if agent.conversation == None:
+        if agent.conversation == None and len(perceived) > 0:
             react, interact = agent.react(self.time, perceived)
             if react!=-1: 
                 agent.status = interact
@@ -130,7 +130,8 @@ class Game:
         children = []
         if not root: 
             root = self.root
-            children = [agent.object]
+            if agent.object != None:
+                children = [agent.object]
         children.extend(root.children)
 
         choices = ''
@@ -140,12 +141,10 @@ class Game:
         query = f'Given the place(s) above, write a JSON dictionary object with "choice": int. Choice should be one of the indices shown above. Make its value the index of the place which is the most reasonable for {agent.name} to do the following activity: {agent.status}'
         prompt = '\n'.join([choices, query])
         expected_structure = {
-            "state": str,
+            "choice": int,
         }
         dictionary = prompt_until_success(prompt, expected_structure)
-
-        index = dictionary['choice'] - 1
-        if index > len(root.children) - 1 or index < 0: index = 0
+        index = dictionary["choice"]
 
         location = root.children[index]
         if not location.children: return location

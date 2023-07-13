@@ -217,8 +217,6 @@ class Agent:
             "duration": int,
         }
         dictionary = prompt_until_success(prompt, expected_structure)
-        index = dictionary['choice'] - 1
-        if index >= len(memories) or index < 0: return -1, False
         
         self.status = dictionary['interact']
         self.busy_time = dictionary['duration'] * 60
