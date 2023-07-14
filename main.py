@@ -82,7 +82,7 @@ def main():
         print(game.time)
         update_server_info(i, game)
         send_server_info(i, data, game, game_states)
-        
+        print()
         # Delay the specified time
         # time.sleep(1)​
     

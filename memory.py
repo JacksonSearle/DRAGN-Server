@@ -14,7 +14,7 @@ class Memory:
 
     def generate_importance(self):
         # Prompt chatgpt
-        prompt = f'On the scale of 1 to 10, where 1 is purely mundane (e.g., brushing teeth, making bed) and 10 is extremely poignant (e.g., a break up, college acceptance), rate the likely poignancy of the following piece of memory. Return your answer as a JSON object with one field, importance: int. Memory: {self.description}'
+        prompt = f'On the scale of 1 to 10, where 1 is purely mundane (e.g., brushing teeth, making bed) and 10 is extremely poignant (e.g., a break up, college acceptance), rate the likely poignancy of the following piece of memory. Memory: {self.description}\n\nReturn your answer as a JSON object with one field, importance: int'
 
         # Turn it into a JSON
         expected_structure = {

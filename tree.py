@@ -1,9 +1,7 @@
 class Node:
-    def __init__(self, name, path, x=None, y=None, z=None):
+    def __init__(self, name, path, location=None):
         self.name = name
-        self.x = x
-        self.y = y
-        self.z = z
+        self.location = location
         self.path = path
         self.state = 'idle'
         self.children = []
@@ -16,8 +14,9 @@ class Node:
 
 def build_tree(data, parent=None, path=''):
     x, y, z = data['position'] if data['position'] else (None, None, None)
+    location = {"x": x, "y": y, "z": z}
     path = path + '/' + data['name'] if path else data['name']
-    node = Node(data['name'], path, x, y, z)
+    node = Node(data['name'], path, location)
     for child in data['children']: build_tree(child, node, path)
     if parent: parent.add_child(node)
     else: return node
@@ -25,7 +24,7 @@ def build_tree(data, parent=None, path=''):
 def get_all_nodes(root):
     nodes = []
     if root:
-        if root.x != None:
+        if root.children == []:
             nodes.append(root)
         for child in root.children:
             nodes += get_all_nodes(child)

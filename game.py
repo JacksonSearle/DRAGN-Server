@@ -40,7 +40,7 @@ class Game:
     def update(self, data):
         for i, agent in enumerate(self.agents):
             data['agents'][i]['status'] = agent.status
-            data['agents'][i]['destination'] = agent.destination
+            data['agents'][i]['destination'] = {"nameId": agent.object.name, "location": agent.destination}
             data['agents'][i]['conversation'] = agent.conversation
 
     def update_agents(self):
@@ -73,7 +73,7 @@ class Game:
         choices = []
         #TODO: Front-end determines the objects seen by the agent
         for place in self.places:
-            if agent.is_within_range(place.x, place.y, place.z):
+            if agent.is_within_range(place.location["x"], place.location["y"], place.location["z"]):
                 # Make an observation for that thing if its state is different or newly observed
                 if place.name not in agent.last_observed or agent.last_observed[place.name] != place.state:
                     agent.last_observed[place.name] = place.state
@@ -126,7 +126,7 @@ class Game:
         }
         dictionary = prompt_until_success(prompt, expected_structure)
         agent.object.state = dictionary['state']
-        agent.destination = {"x":agent.object.x, "y":agent.object.y, "z":agent.object.z}
+        agent.destination = agent.object.location
     
     def choose_location(self,agent,root=None):
         children = []

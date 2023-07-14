@@ -19,28 +19,28 @@ def valid_json(json_str, expected_structure):
 
     for key, value_type in expected_structure.items():
         if key not in data:
-            return False #, f"Missing key: {key}"
+            return False, json_str #, f"Missing key: {key}"
         if isinstance(value_type, list):  # special handling for lists
             if not isinstance(data[key], list):
-                return False #, f"Incorrect type for key: {key}. Expected a list, but got {type(data[key])}."
+                return False, json_str #, f"Incorrect type for key: {key}. Expected a list, but got {type(data[key])}."
             if not all(isinstance(i, value_type[0]) for i in data[key]):
-                return False #, f"Incorrect type for elements in key: {key}. Expected {value_type[0]}, but got different type."
+                return False, json_str #, f"Incorrect type for elements in key: {key}. Expected {value_type[0]}, but got different type."
         else:  # for non-lists, we can directly use isinstance
             if not isinstance(data[key], value_type):
-                return False #, f"Incorrect type for key: {key}. Expected {value_type}, but got {type(data[key])}."
-    return True
+                return False, json_str #, f"Incorrect type for key: {key}. Expected {value_type}, but got {type(data[key])}."
+    return True, json_str
 
 def prompt_until_success(prompt, expected_structure):
     response_text = query_model(prompt, expected_structure)
-    valid_answer = valid_json(response_text, expected_structure)
+    valid_answer, json_str = valid_json(response_text, expected_structure)
     i = 0
     num_tries = 10
     while i < num_tries and not valid_answer:
         response_text = query_model(prompt, expected_structure)
-        valid_answer = valid_json(response_text, expected_structure)
+        valid_answer, json_str = valid_json(response_text, expected_structure)
         i += 1
     if valid_answer:
-        dictionary = json.loads(response_text)
+        dictionary = json.loads(json_str)
         print(f'{dictionary}\n\n')
         return dictionary
     else:

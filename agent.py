@@ -2,6 +2,7 @@ import math
 import json
 import numpy as np
 import re
+from tree import Node
 from numpy.linalg import norm
 from util import *
 from sentence_embed import embed
@@ -28,7 +29,8 @@ class Agent:
         self.destination = None
         self.status = 'idle'
         self.last_observed = {}
-        self.object = None
+        #TODO: Put a real node object from the tree here
+        self.object = Node("None name", "None path", {"x": 0, "y": 0, "z": 0})
         self.conversation = None
         self.summary_description = None
         self.update_summary_description(time)
