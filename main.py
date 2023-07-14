@@ -4,7 +4,7 @@ from game import Game
 from pathlib import Path
 # import cProfile
 #from init_unreal import content_path
-import global_path
+from config import global_path
 
 def update_world_tree():
     with open(Path(global_path.path + 'world_tree.json'), 'r') as file: places = json.load(file)

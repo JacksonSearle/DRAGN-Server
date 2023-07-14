@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 # from init_unreal import content_path
 # This loads the API key as an environment variable
-import global_path
+from config import global_path
 print()
 openai.api_key_path = (global_path.path + ".env")
 load_dotenv(global_path.path)

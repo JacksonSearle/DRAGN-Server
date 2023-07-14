@@ -1,7 +1,7 @@
 import re
 import json
 from util import *
-from sentence_embed import embed
+from util import embed
 
 class Memory:
     def __init__(self, time, description, type="Observation"):

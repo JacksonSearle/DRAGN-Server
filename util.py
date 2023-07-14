@@ -1,6 +1,7 @@
 import time
 import json
 import config
+from sentence_transformers import SentenceTransformer
 
 if config.MODE == 'debugging':
     from debugging_model import query_model  # Import for debugging mode
@@ -15,7 +16,7 @@ def valid_json(json_str, expected_structure):
     try:
         data = json.loads(json_str)
     except ValueError as e:
-        return False
+        return False, json_str
 
     for key, value_type in expected_structure.items():
         if key not in data:
@@ -65,3 +66,12 @@ def set_start_time(year, month, day, hour, minute, second):
 def time_prompt(curr_time):
     formatted_time = "It is " + time.strftime("%B %d, %Y, %I:%M %p.", curr_time)
     return formatted_time
+
+#test = ["This is an example sentence", "Each sentence is converted"]
+
+model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2')
+#embeddings = model.encode(test)
+#print(embeddings)
+
+def embed(sentences):
+    return model.encode(sentences)

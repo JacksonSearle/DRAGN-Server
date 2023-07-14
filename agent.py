@@ -5,7 +5,7 @@ import re
 from tree import Node
 from numpy.linalg import norm
 from util import *
-from sentence_embed import embed
+from util import embed
 from time import mktime
 from memory import Memory
 

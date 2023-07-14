@@ -7,7 +7,7 @@ from memory import Memory
 from tree import get_all_nodes, build_tree
 from character_sheets import character_sheets
 
-import global_path
+from config import global_path
 #from init_unreal import content_path
 
 class Game:
