@@ -1,1 +1,29 @@
-{"agents": [{"name": "Frank", "position": {"x": 44, "y": 10, "z": 10}}, {"name": "Bob", "position": {"x": 10, "y": 10, "z": 10}}, {"name": "Alice", "position": {"x": 10, "y": 10, "z": 10}}]}
+{
+    "save": false,
+    "agents": [
+        {
+            "name": "Frank",
+            "position": {
+                "x": 44,
+                "y": 10,
+                "z": 10
+            }
+        },
+        {
+            "name": "Bob",
+            "position": {
+                "x": 10,
+                "y": 10,
+                "z": 10
+            }
+        },
+        {
+            "name": "Alice",
+            "position": {
+                "x": 10,
+                "y": 10,
+                "z": 10
+            }
+        }
+    ]
+}
