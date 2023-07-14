@@ -87,12 +87,13 @@ class Agent:
     def summarize_day(self,time):
         return self.summary_description_prompt(time, 'day', 50)
 
-    def plan_day(self,time):
+    def plan_day(self, time):
         query = f'It is {format_time(time)}. What are {self.name}\'s plans today, given the following summary of what he did yesterday? Return a json object with one field, "plan": str'
         prompt = '\n'.join([self.summary_description, query, self.yesterday_summary])
         expected_structure = {
             "plan": str
         }
+        print('PLANNING DAY')
         dictionary = prompt_until_success(prompt, expected_structure)
         self.dayplan = dictionary["plan"]
         self.plan_hour(time)

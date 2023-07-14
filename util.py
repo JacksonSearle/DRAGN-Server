@@ -41,6 +41,7 @@ def prompt_until_success(prompt, expected_structure):
         i += 1
     if valid_answer:
         dictionary = json.loads(response_text)
+        print(f'{dictionary}\n\n')
         return dictionary
     else:
         print(f'ERROR: FAILED {num_tries} times\nPrompt: {prompt}')

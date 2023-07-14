@@ -85,6 +85,8 @@ class Game:
         # Choose whether or not to react to each observation
         if agent.conversation == None and len(perceived) > 0:
             react, interact = agent.react(self.time, perceived)
+            if react > len(choices)-1:
+                react = len(choices)-1
             if react!=-1: 
                 agent.status = interact
                 self.execute_plan(agent, choices[react])
