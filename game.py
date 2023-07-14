@@ -7,14 +7,14 @@ from memory import Memory
 from tree import get_all_nodes, build_tree
 from character_sheets import character_sheets
 
-from config import global_path
+from config import path
 #from init_unreal import content_path
 
 class Game:
     def __init__(self, time_step):
         self.time_step = time_step
         self.time = set_start_time(2023, 5, 24, 7, 0, 0)
-        with open(Path(global_path.path + 'world_tree.json'), 'r') as file:
+        with open(Path(path + 'world_tree.json'), 'r') as file:
             self.root = build_tree(json.load(file))
         self.places = get_all_nodes(self.root)
         self.agents = self.make_agents()
@@ -27,7 +27,7 @@ class Game:
             data['agents'].append({})
             data['agents'][i]['name'] = agent.name
             data['agents'][i]['status'] = agent.status
-            data['agents'][i]['destination'] = agent.destination
+            data['agents'][i]['destination'] = agent.destination.location
             data['agents'][i]['conversation'] = agent.conversation
         return data
     
@@ -40,7 +40,7 @@ class Game:
     def update(self, data):
         for i, agent in enumerate(self.agents):
             data['agents'][i]['status'] = agent.status
-            data['agents'][i]['destination'] = {"nameId": agent.object.name, "location": agent.destination}
+            data['agents'][i]['destination'] = {"nameId": agent.destination.name, "location": agent.destination.location}
             data['agents'][i]['conversation'] = agent.conversation
 
     def update_agents(self):
@@ -73,7 +73,7 @@ class Game:
         choices = []
         #TODO: Front-end determines the objects seen by the agent
         for place in self.places:
-            if agent.is_within_range(place.location["x"], place.location["y"], place.location["z"]):
+            if agent.is_within_range(place.location):
                 # Make an observation for that thing if its state is different or newly observed
                 if place.name not in agent.last_observed or agent.last_observed[place.name] != place.state:
                     agent.last_observed[place.name] = place.state
@@ -96,7 +96,7 @@ class Game:
     def perceive_agents(self,agent):
         for j, other_agent in enumerate(self.agents):
             # Make sure an agent isn't talking to themselves
-            if agent is not other_agent and agent.is_within_range(other_agent.x, other_agent.y, other_agent.z):
+            if agent is not other_agent and agent.is_within_range(other_agent.location):
                 # Make both agents see each other
                 #TODO: prompts do not consistently produce statuses that fit with this sentence structure, e.g "Bob is check on Alice", "Alice is Alice would chat"
                 description = f'{other_agent.name}\'s plan is to {other_agent.status}'
@@ -116,24 +116,23 @@ class Game:
                     self.conversation(agent, other_agent)
 
     
-    def execute_plan(self,agent,object=None):
-        if agent.object: agent.object.state = "idle"
-        if object: agent.object = object
-        else: agent.object = self.choose_location(agent)
-        prompt = f'{agent.name} is {agent.status} at the {agent.object.name}. Generate a JSON dictionary object with a single field, "state": string, which describes the state the {agent.object.name} is in.'
+    def execute_plan(self,agent,destination=None):
+        if agent.destination: agent.destination.state = "idle"
+        if destination: agent.destination = destination
+        else: agent.destination = self.choose_location(agent)
+        prompt = f'{agent.name} is {agent.status} at the {agent.destination.name}. Generate a JSON dictionary object with a single field, "state": string, which describes the state the {agent.destination.name} is in.'
         expected_structure = {
             "state": str,
         }
         dictionary = prompt_until_success(prompt, expected_structure)
-        agent.object.state = dictionary['state']
-        agent.destination = agent.object.location
+        agent.destination.state = dictionary['state']
     
     def choose_location(self,agent,root=None):
         children = []
         if not root: 
             root = self.root
-            if agent.object != None:
-                children = [agent.object]
+            if agent.destination != None:
+                children = [agent.destination]
         children.extend(root.children)
 
         choices = ''
@@ -159,7 +158,7 @@ class Game:
         conversation = agent.converse(other_agent, self.time)
         # TODO: could we set their destination to a halfway point between the agents?
         agent.conversation, other_agent.conversation = conversation, conversation
-        agent.destination, other_agent.destination = None, None
+        agent.destination.location, other_agent.destination.location = None, None
 
         conversation_description = self.create_conversation_description(conversation)
         shared_memory = Memory(self.time, conversation_description)

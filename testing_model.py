@@ -7,10 +7,10 @@ from dotenv import load_dotenv
 
 # from init_unreal import content_path
 # This loads the API key as an environment variable
-from config import global_path
+from config import path
 print()
-openai.api_key_path = (global_path.path + ".env")
-load_dotenv(global_path.path)
+openai.api_key_path = (path + ".env")
+load_dotenv(path)
 # Maximum number of API calls per day
 MAX_API_CALLS = 1000
 
@@ -46,7 +46,7 @@ def query_model(prompt, _):
 
 def model(messages):
     # Load or initialize the count and date
-    filename = global_path.path + 'prompts/api_calls.json'
+    filename = path + 'prompts/api_calls.json'
     if os.path.isfile(filename):
         with open(filename, 'r') as f:
             data = json.load(f)

@@ -14,7 +14,7 @@ class Agent:
         self.memory_stream = []
         self.name = character_sheet['name']
         self.age = character_sheet['age']
-        self.x, self.y, self.z = character_sheet['position']['x'], character_sheet['position']['y'], character_sheet['position']['z']
+        self.location = {'x': character_sheet['position']['x'], 'y': character_sheet['position']['y'], 'z': character_sheet['position']['z']}
         self.innate_traits = character_sheet['innate_traits']
         self.seed_memories = character_sheet['seed_memories']
         self.prep_seeds(time)
@@ -26,11 +26,10 @@ class Agent:
         self.hourplans = ['Sleeping.']
         self.yesterday_summary = ''
 
-        self.destination = None
         self.status = 'idle'
         self.last_observed = {}
         #TODO: Put a real node object from the tree here
-        self.object = Node("None name", "None path", {"x": 0, "y": 0, "z": 0})
+        self.destination = Node("None name", "None path", {"x": 0, "y": 0, "z": 0})
         self.conversation = None
         self.summary_description = None
         self.update_summary_description(time)
@@ -58,8 +57,9 @@ class Agent:
             memory = Memory(time, description)
             self.memory_stream.append(memory)
 
-    def is_within_range(self, x2, y2, z2):
-        x1, y1, z1 = self.x, self.y, self.z
+    def is_within_range(self, location):
+        x2, y2, z2 = location['x'], location['y'], location['z']
+        x1, y1, z1 = self.destination.location['x'], self.destination.location['y'], self.destination.location['z']
         distance = math.sqrt((x2 - x1)**2 + (y2 - y1)**2 + (z2 - z1)**2)
         return distance <= self.vision_radius
 
