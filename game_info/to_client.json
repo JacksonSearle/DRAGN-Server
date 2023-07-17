@@ -1,4 +1,5 @@
 {
+    "spawn": false,
     "agents": [
         {
             "name": "Frank",
@@ -11,7 +12,12 @@
                     "z": 500
                 }
             },
-            "conversation": null
+            "conversation": null,
+            "spawn_location": {
+                "x": -994,
+                "y": -4340,
+                "z": 646
+            }
         },
         {
             "name": "Bob",
@@ -24,7 +30,12 @@
                     "z": 500
                 }
             },
-            "conversation": null
+            "conversation": null,
+            "spawn_location": {
+                "x": -967,
+                "y": -3499,
+                "z": 646
+            }
         },
         {
             "name": "Alice",
@@ -37,7 +48,12 @@
                     "z": 500
                 }
             },
-            "conversation": null
+            "conversation": null,
+            "spawn_location": {
+                "x": -967,
+                "y": -3499,
+                "z": 646
+            }
         },
         {
             "name": "Claire",
@@ -50,7 +66,12 @@
                     "z": 500
                 }
             },
-            "conversation": null
+            "conversation": null,
+            "spawn_location": {
+                "x": -2103,
+                "y": -2711,
+                "z": 646
+            }
         },
         {
             "name": "Doug",
@@ -63,7 +84,12 @@
                     "z": 500
                 }
             },
-            "conversation": null
+            "conversation": null,
+            "spawn_location": {
+                "x": -2103,
+                "y": -2711,
+                "z": 646
+            }
         },
         {
             "name": "Eve",
@@ -76,7 +102,12 @@
                     "z": 500
                 }
             },
-            "conversation": null
+            "conversation": null,
+            "spawn_location": {
+                "x": -1827,
+                "y": -4790,
+                "z": 646
+            }
         },
         {
             "name": "Ginny",
@@ -89,7 +120,12 @@
                     "z": 500
                 }
             },
-            "conversation": null
+            "conversation": null,
+            "spawn_location": {
+                "x": -2929,
+                "y": -3772,
+                "z": 646
+            }
         },
         {
             "name": "Hash",
@@ -102,7 +138,12 @@
                     "z": 500
                 }
             },
-            "conversation": null
+            "conversation": null,
+            "spawn_location": {
+                "x": -2435,
+                "y": -4512,
+                "z": 646
+            }
         },
         {
             "name": "Irene",
@@ -115,7 +156,12 @@
                     "z": 500
                 }
             },
-            "conversation": null
+            "conversation": null,
+            "spawn_location": {
+                "x": null,
+                "y": null,
+                "z": null
+            }
         },
         {
             "name": "Joseph",
@@ -128,7 +174,13 @@
                     "z": 500
                 }
             },
-            "conversation": null
+            "conversation": null,
+            "spawn_location": {
+                "x": -1402,
+                "y": -2893,
+                "z": 646
+            }
         }
-    ]
+    ],
+    "stop": true
 }

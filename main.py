@@ -53,9 +53,6 @@ def update_server_info(i, game):
 def send_server_info(i, data, game, game_states):
     # Calculate the next step in the game
     game.update_agents()
-    # Possibly end the game
-    if i == game_states - 1:
-        data['stop'] = True
         
     # Update our computed info
     game.update(data)
@@ -79,6 +76,8 @@ def main():
 
     for i in range(game_states):
         print(f'-------EPOCH: {i}------')
+        if i > 0:
+            data['spawn'] = False
         print(game.time)
         update_server_info(i, game)
         send_server_info(i, data, game, game_states)

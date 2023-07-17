@@ -17,11 +17,22 @@ class Game:
         with open(Path(path + 'world_tree.json'), 'r') as file:
             self.root = build_tree(json.load(file))
         self.places = get_all_nodes(self.root)
+        self.populate_lookup_places()
         self.agents = self.make_agents()
+
+    def populate_lookup_places(self):
+        lookup_places = {}
+        self.lookup(self.root, lookup_places)
+        self.lookup_places = lookup_places
+
+    def lookup(self, node, lookup_places):
+        lookup_places[node.path] = node
+        for child in node.children:
+            self.lookup(child, lookup_places)
 
     def initial_json(self):
         data = {}
-        data['stop'] = False
+        data['spawn'] = True
         data['agents'] = []
         for i, agent in enumerate(self.agents):
             data['agents'].append({})
@@ -29,12 +40,13 @@ class Game:
             data['agents'][i]['status'] = agent.status
             data['agents'][i]['destination'] = agent.destination.location
             data['agents'][i]['conversation'] = agent.conversation
+            data['agents'][i]['spawn_location'] = agent.spawn.location
         return data
     
     def make_agents(self):
         agents = []
         for character_sheet in character_sheets:
-            agents.append(Agent(character_sheet, self.time))
+            agents.append(Agent(character_sheet, self.time, self))
         return agents
 
     def update(self, data):

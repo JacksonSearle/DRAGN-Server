@@ -10,7 +10,7 @@ from time import mktime
 from memory import Memory
 
 class Agent:
-    def __init__(self, character_sheet, time):
+    def __init__(self, character_sheet, time, game):
         self.memory_stream = []
         self.name = character_sheet['name']
         self.age = character_sheet['age']
@@ -20,6 +20,7 @@ class Agent:
         self.prep_seeds(time)
         self.vision_radius = character_sheet['vision_radius']
         self.waking_hours = character_sheet['waking_hours']
+        self.spawn = game.lookup_places[character_sheet['spawn']]
 
         self.busy_time = 0
         self.dayplan = ''
