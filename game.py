@@ -124,7 +124,7 @@ class Game:
                 if react:
                     agent.status = interact
                     # make a memory for the person they are talking to
-                    description = f'{agent.name} is {agent.status}'
+                    description = agent.status
                     memory = Memory(self.time, description)
                     other_agent.add_memory(memory)
                     other_agent.status = description
@@ -162,6 +162,11 @@ class Game:
         }
         dictionary = prompt_until_success(prompt, expected_structure)
         index = dictionary["choice"]
+
+        if index < 0:
+            index = 0
+        if index > len(root.children) - 1:
+            index = len(root.children) - 1
 
         location = root.children[index]
         if not location.children: return location
