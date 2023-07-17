@@ -1,6 +1,8 @@
+import os
 import time
 import json
 import config
+from config import path
 from sentence_transformers import SentenceTransformer
 
 if config.MODE == 'debugging':
@@ -75,3 +77,13 @@ model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2')
 
 def embed(sentences):
     return model.encode(sentences)
+
+def get_index():
+    folder_path = path + 'saved_games'
+
+    if os.path.isdir(folder_path):
+        file_count = len([name for name in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, name))])
+        print(f"The folder '{folder_path}' contains {file_count} files.")
+        return file_count
+    else:
+        print(f"The path '{folder_path}' is not a valid folder.")

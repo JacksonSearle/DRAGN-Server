@@ -1,7 +1,9 @@
+import os
 from util import *
 from multiprocessing import Pool
 from pathlib import Path
 import json
+import pickle
 from agent import Agent
 from memory import Memory
 from tree import get_all_nodes, build_tree
@@ -19,6 +21,7 @@ class Game:
         self.places = get_all_nodes(self.root)
         self.populate_lookup_places()
         self.agents = self.make_agents()
+        self.get_save_index()
 
     def populate_lookup_places(self):
         lookup_places = {}
@@ -32,6 +35,7 @@ class Game:
 
     def initial_json(self):
         data = {}
+        data['save_index'] = self.save_index
         data['spawn'] = True
         data['agents'] = []
         for i, agent in enumerate(self.agents):
@@ -184,3 +188,11 @@ class Game:
         }
         dictionary = prompt_until_success(message, expected_structure)
         return dictionary["description"]
+    
+    def get_save_index(self):
+        self.save_index = get_index()
+
+    def save(self):
+        pickle_file_name = path + f'saved_games/save_state_{self.save_index}.pkl'
+        with open(pickle_file_name, 'wb') as file:
+            pickle.dump(self, file)

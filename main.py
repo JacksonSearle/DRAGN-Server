@@ -1,5 +1,7 @@
 import json
 import time
+import pickle
+import util
 from game import Game
 from pathlib import Path
 # import cProfile
@@ -43,6 +45,9 @@ def update_server_info(i, game):
     # Reading a JSON file
     with open(Path(path + 'game_info/to_server.json'), 'r') as file:
         c_data = json.load(file)
+    if c_data['save']:
+        game.save()
+        return True
     c_agents = c_data['agents']
 
     # Update the server agent's position
@@ -61,11 +66,28 @@ def send_server_info(i, data, game, game_states):
     with open(Path(path + 'game_info/to_client.json'), 'w') as file:
         json.dump(data, file)
 
+def load_game(time_step):
+    with open(Path(path + 'game_info/to_server.json'), 'r') as file:
+        c_data = json.load(file)
+    index = c_data['load_file']
+    if index == -1:
+        update_world_tree()
+        game = Game(time_step=time_step)
+    else:
+        pickle_file_name = path + f'saved_games/save_state_{index}.pkl'
+        with open(pickle_file_name, 'rb') as file:
+            game = pickle.load(file)
+    return game
+
+
+    
+
 def main():
-    game_states = 60 # number of time steps
+    game_states = 3 # number of time steps
     time_step = 600 # seconds
-    update_world_tree()
-    game = Game(time_step=time_step)
+
+    game = load_game(time_step)
+    game.save_index = util.get_index()
     data = gather_initial_data(game)
 
     # i = int(state)
@@ -79,7 +101,9 @@ def main():
         if i > 0:
             data['spawn'] = False
         print(game.time)
-        update_server_info(i, game)
+        stop = update_server_info(i, game)
+        if stop:
+            break
         send_server_info(i, data, game, game_states)
         print()
         # Delay the specified time

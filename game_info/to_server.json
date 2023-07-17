@@ -1,5 +1,6 @@
 {
     "save": false,
+    "load_file": -1,
     "agents": [
         {
             "name": "Frank",
