@@ -2,7 +2,7 @@ import json
 import time
 import os.path
 
-def pathfinding(dest_x, dest_y, dest_z, x, y, z):
+def pathfinding(dest_x, dest_y, dest_z, x, y, z, step=100):
     # Calculate the difference between current position and destination
     dx = dest_x - x
     dy = dest_y - y
@@ -12,19 +12,19 @@ def pathfinding(dest_x, dest_y, dest_z, x, y, z):
     largest = max(abs(dx), abs(dy), abs(dz))
     if abs(dx) == largest:
         if dx > 0:
-            x += 1
+            x += min(dx, step)
         else:
-            x -= 1
-    elif abs(dy == largest):
+            x -= min(abs(dx), step)
+    elif abs(dy) == largest:
         if dy > 0:
-            y += 1
+            y += min(dy, step)
         else:
-            y -= 1
+            y -= min(abs(dy), step)
     else:
         if dz > 0:
-            z += 1
+            z += min(dz, step)
         else:
-            z -= 1
+            z -= min(abs(dz), step)
 
     return x, y, z
 
@@ -39,7 +39,7 @@ def update():
 
     # Modifying data
     for s_agent, c_agent in zip(s_data['agents'], c_data['agents']):
-        dest_x, dest_y, dest_z = s_agent['destination']['x'], s_agent['destination']['y'], s_agent['destination']['z']
+        dest_x, dest_y, dest_z = s_agent['destination']['location']['x'], s_agent['destination']['location']['y'], s_agent['destination']['location']['z']
         x, y, z = c_agent['position']['x'], c_agent['position']['y'], c_agent['position']['z']
         x, y, z = pathfinding(dest_x, dest_y, dest_z, x, y, z)
         c_agent['position'] = {"x": x, "y": y, "z": z}
