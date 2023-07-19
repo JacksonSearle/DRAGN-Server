@@ -83,8 +83,13 @@ def load_game(time_step):
     
 
 def main():
-    game_states = 3 # number of time steps
-    time_step = 600 # seconds
+    game_states = 80 # number of time steps
+    time_step = 60*5 # seconds
+
+    # Ensure 60*60/time step is an integer
+    result = (60*60)/time_step
+    if not result.is_integer():
+        print("\nCHANGE TIME STEP\nPLANNING WILL NOT WORK PROPERLY")
 
     game = load_game(time_step)
     game.save_index = util.get_index()
@@ -97,7 +102,7 @@ def main():
     # send_server_info(i, data, game, game_states)
 
     for i in range(game_states):
-        print(f'-------EPOCH: {i}------')
+        print(f'-------TIME STEP: {i}------')
         if i > 0:
             data['spawn'] = False
         print(game.time)
@@ -107,8 +112,8 @@ def main():
         send_server_info(i, data, game, game_states)
         print()
         # Delay the specified time
-        # time.sleep(1)​
-    
+        # time.sleep(1)
+
     print('Done with simulation')
 
 main()
