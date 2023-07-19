@@ -39,10 +39,16 @@ def update():
 
     # Modifying data
     for s_agent, c_agent in zip(s_data['agents'], c_data['agents']):
-        dest_x, dest_y, dest_z = s_agent['destination']['location']['x'], s_agent['destination']['location']['y'], s_agent['destination']['location']['z']
+        try:
+            dest_x, dest_y, dest_z = s_agent['destination']['location']['x'], s_agent['destination']['location']['y'], s_agent['destination']['location']['z']
+        except:
+            print(f'S_DATA\n\n{s_data}\n\nS_AGENT\n\n{s_agent}')
         x, y, z = c_agent['position']['x'], c_agent['position']['y'], c_agent['position']['z']
         x, y, z = pathfinding(dest_x, dest_y, dest_z, x, y, z)
-        c_agent['position'] = {"x": x, "y": y, "z": z}
+        if s_data['spawn']:
+            c_agent['position'] = {"x": s_data['spawn_location'], "y": s_data['spawn_location'], "z": s_data['spawn_location']}
+        else:
+            c_agent['position'] = {"x": x, "y": y, "z": z}
 
     # Writing to a JSON file
     with open('game_info/to_server.json', 'w') as file:

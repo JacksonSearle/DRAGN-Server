@@ -60,7 +60,7 @@ class Agent:
 
     def is_within_range(self, location):
         x2, y2, z2 = location['x'], location['y'], location['z']
-        x1, y1, z1 = self.destination.location['x'], self.destination.location['y'], self.destination.location['z']
+        x1, y1, z1 = self.location['x'], self.location['y'], self.location['z']
         distance = math.sqrt((x2 - x1)**2 + (y2 - y1)**2 + (z2 - z1)**2)
         return distance <= self.vision_radius
 
@@ -96,10 +96,9 @@ class Agent:
         expected_structure = {
             "plan": str
         }
-        print('PLANNING DAY')
         dictionary = prompt_until_success(prompt, expected_structure)
+        print("PLANNING DAY")
         self.dayplan = dictionary["plan"]
-        self.plan_hour(time)
     
     def plan_hour(self,time):
         dayplan = f'{self.name}\'s daily plan: ' + self.dayplan
@@ -110,8 +109,8 @@ class Agent:
             "plan": str
         }
         dictionary = prompt_until_success(prompt, expected_structure)
+        print("PLANNING HOUR")
         self.hourplans.append(dictionary["plan"])
-        self.plan_next(time)  
 
     def plan_next(self,time):
         hourplan = f'{self.name}\'s plan this hour: ' + self.hourplans[-1]
@@ -123,6 +122,7 @@ class Agent:
             "duration": int
         }
         dictionary = prompt_until_success(prompt, expected_structure)
+        print("PLANNING NEXT")
         self.status, self.busy_time = dictionary['plan'], dictionary['duration']*60
 
     
@@ -142,6 +142,7 @@ class Agent:
         }
         prompt = '\n'.join([relevant_context, question])
         dictionary = prompt_until_success(prompt, expected_structure)
+        print("REFLECTING QUESTIONS")
         response_queries = dictionary["questions"]
 
         statements = f"Statements about {self.name}\n"
@@ -154,6 +155,7 @@ class Agent:
             "insights": [str]
         }
         dictionary = prompt_until_success(prompt, expected_structure)
+        print("REFLECTING INSIGHTS")
         response_text = dictionary["insights"]
         for r in response_text: self.add_memory(Memory(time, r, "Reflection"))
 
@@ -200,6 +202,7 @@ class Agent:
             "description": str
         }
         dictionary = prompt_until_success(prompt, expected_structure)
+        print("UPDATING SUMMARY DESCRIPTION")
         return dictionary["description"]
 
     def format_status(self):
@@ -221,6 +224,7 @@ class Agent:
             "duration": int,
         }
         dictionary = prompt_until_success(prompt, expected_structure)
+        print("REACTING")
         
         self.status = dictionary['interact']
         self.busy_time = dictionary['duration'] * 60
@@ -246,6 +250,7 @@ class Agent:
             "conversation": str,
         }
         dictionary = prompt_until_success(prompt, expected_structure)
+        print("CONVERSING")
         return dictionary['conversation']
 
     

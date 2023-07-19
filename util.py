@@ -44,7 +44,7 @@ def prompt_until_success(prompt, expected_structure):
         i += 1
     if valid_answer:
         dictionary = json.loads(json_str)
-        print(f'{dictionary}\n\n')
+        # print(f'{dictionary}\n\n')
         return dictionary
     else:
         print(f'ERROR: FAILED {num_tries} times\nPrompt: {prompt}')
@@ -62,7 +62,7 @@ def increase_time(curr_time, seconds):
     return time.localtime(new_time)
 
 def set_start_time(year, month, day, hour, minute, second):
-    start_time = time.struct_time((year, month, day, hour, minute, second, 1, 1, 0))
+    start_time = time.struct_time((year, month, day, hour, minute, second, 1, 1, 1))
     return start_time
 
 def time_prompt(curr_time):

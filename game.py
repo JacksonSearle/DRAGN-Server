@@ -42,7 +42,7 @@ class Game:
             data['agents'].append({})
             data['agents'][i]['name'] = agent.name
             data['agents'][i]['status'] = agent.status
-            data['agents'][i]['destination'] = agent.destination.location
+            data['agents'][i]['destination'] = {"nameId": agent.destination.name, "location": agent.destination.location}
             data['agents'][i]['conversation'] = agent.conversation
             data['agents'][i]['spawn_location'] = agent.spawn.location
         return data
@@ -60,9 +60,9 @@ class Game:
             data['agents'][i]['conversation'] = agent.conversation
 
     def update_agents(self):
-        self.time = increase_time(self.time, self.time_step)
         for agent in self.agents:
             self.update_agent(agent)
+        self.time = increase_time(self.time, self.time_step)
         # with Pool(processes=10) as pool:
         #     pool.map(self.update_agent, self.agents)
         
@@ -71,16 +71,18 @@ class Game:
         timeofday = get_timeofday(self.time)
         if timeofday == agent.waking_hours["up"]: 
             agent.plan_day(self.time)
+            agent.plan_hour(self.time)
+            agent.plan_next(self.time)
             self.execute_plan(agent)
-        #Call reflection if agent is going to bed, or call hour/minute plans if during waking hours
         elif timeofday == agent.waking_hours["down"]: agent.reflect(self.time)
         elif agent.waking_hours["up"] < timeofday < agent.waking_hours["down"]:
             if not self.perceive_objects(agent):
                 self.perceive_agents(agent)
+            if timeofday%100 == 0:
+                agent.plan_hour(self.time)
             if agent.busy_time <= 0:
                 agent.conversation = None
-                if timeofday%100 == 0: agent.plan_hour(self.time)
-                else: agent.plan_next(self.time)
+                agent.plan_next(self.time)
                 self.execute_plan(agent)
             else: agent.busy_time -= self.time_step
 
@@ -113,6 +115,7 @@ class Game:
         for j, other_agent in enumerate(self.agents):
             # Make sure an agent isn't talking to themselves
             if agent is not other_agent and agent.is_within_range(other_agent.location):
+                print("AGENT SEES ANOTHER AGENT")
                 # Make both agents see each other
                 #TODO: prompts do not consistently produce statuses that fit with this sentence structure, e.g "Bob is check on Alice", "Alice is Alice would chat"
                 description = f'{other_agent.name}\'s plan is to {other_agent.status}'
@@ -141,6 +144,7 @@ class Game:
             "state": str,
         }
         dictionary = prompt_until_success(prompt, expected_structure)
+        print("EXECUTING PLAN")
         agent.destination.state = dictionary['state']
     
     def choose_location(self,agent,root=None):
@@ -161,6 +165,7 @@ class Game:
             "choice": int,
         }
         dictionary = prompt_until_success(prompt, expected_structure)
+        print("CHOOSING LOCATION")
         index = dictionary["choice"]
 
         if index < 0:
@@ -192,6 +197,7 @@ class Game:
             "description": str
         }
         dictionary = prompt_until_success(message, expected_structure)
+        print("CREATING CONVERSATION DESCRIPTION")
         return dictionary["description"]
     
     def get_save_index(self):

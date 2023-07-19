@@ -83,7 +83,7 @@ def load_game(time_step):
     
 
 def main():
-    game_states = 80 # number of time steps
+    game_states = 12*24 # number of time steps
     time_step = 60*5 # seconds
 
     # Ensure 60*60/time step is an integer
@@ -92,14 +92,9 @@ def main():
         print("\nCHANGE TIME STEP\nPLANNING WILL NOT WORK PROPERLY")
 
     game = load_game(time_step)
+    # Put breakpoint here
     game.save_index = util.get_index()
     data = gather_initial_data(game)
-
-    # i = int(state)
-    # print(i)
-    # print(game.time)
-    # update_server_info(i, game)
-    # send_server_info(i, data, game, game_states)
 
     for i in range(game_states):
         print(f'-------TIME STEP: {i}------')

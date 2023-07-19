@@ -36,6 +36,7 @@ def get_valid_response(prompt, keys, types):
         if all(key in response_dict and isinstance(response_dict[key], type_) for key, type_ in zip(keys, types)):
             return response_dict
         # If any key is missing or has the wrong type, try again
+        i += 1
 
 def query_model(prompt, _):
     messages = [
@@ -80,19 +81,8 @@ def model(messages):
         call_count += 1
         with open(filename, 'w') as f:
             json.dump({'count': call_count, 'date': str(last_call_date)}, f)
-        print(f'API Call: {messages[1]["content"]}\n')
+        # print(f'API Call: {messages[1]["content"]}\n')
         return response_text
 
     else:
         print(f"API call limit of {MAX_API_CALLS} per day reached. Please wait until tomorrow.")
-
-# EXAMPLE USAGE
-
-# messages = [
-#     {"role": "system", "content": "You are a helpful assistant."},
-#     {"role": "user", "content": "Who won the world series in 2020?"},
-#     {"role": "assistant", "content": "The Los Angeles Dodgers won the World Series in 2020."},
-#     {"role": "user", "content": "Where was it played?"}
-# ]
-# response_text = model(messages)
-# print(response_text)
