@@ -7,4 +7,5 @@ __pycache__/
 .idea/inspectionProfiles/profiles_settings.xml
 .idea/inspectionProfiles/Project_Default.xml
 .env
+.vscode
 config.py
