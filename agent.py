@@ -183,7 +183,7 @@ class Agent:
         daily_occupation = self.summary_description_prompt(time, 'current daily occupation')
 
         # Feelings about his recent progress in life
-        recent_progress_in_life = self.summary_description_prompt(time, 'feelings about his recent progress in life')
+        recent_progress_in_life = self.summary_description_prompt(time, 'feelings about their recent progress in life')
 
         self.summary_description = '\n'.join([name,
                                             innate_traits,
