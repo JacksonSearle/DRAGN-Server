@@ -2,7 +2,7 @@ import json
 import time
 import os.path
 
-def pathfinding(dest_x, dest_y, dest_z, x, y, z, step=100):
+def pathfinding(dest_x, dest_y, dest_z, x, y, z, step=300):
     # Calculate the difference between current position and destination
     dx = dest_x - x
     dy = dest_y - y
