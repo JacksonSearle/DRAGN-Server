@@ -1,5 +1,4 @@
 import json
-import time
 import pickle
 import util
 from game import Game
@@ -83,21 +82,21 @@ def load_game(time_step):
     
 
 def main():
-    game_states = 12*24 # number of time steps
-    time_step = 60*5 # seconds
-
-    # Ensure 60*60/time step is an integer
-    result = (60*60)/time_step
-    if not result.is_integer():
-        print("\nCHANGE TIME STEP\nPLANNING WILL NOT WORK PROPERLY")
+    game_states = 5 # number of time steps
+    time_step = 600 # seconds
 
     game = load_game(time_step)
-    # Put breakpoint here
     game.save_index = util.get_index()
     data = gather_initial_data(game)
 
+    # i = int(state)
+    # print(i)
+    # print(game.time)
+    # update_server_info(i, game)
+    # send_server_info(i, data, game, game_states)
+
     for i in range(game_states):
-        print(f'-------TIME STEP: {i}------')
+        print(f'-------EPOCH: {i}------')
         if i > 0:
             data['spawn'] = False
         print(game.time)
@@ -107,8 +106,8 @@ def main():
         send_server_info(i, data, game, game_states)
         print()
         # Delay the specified time
-        # time.sleep(1)
-
+        # time.sleep(1)​
+    
     print('Done with simulation')
 
 main()
