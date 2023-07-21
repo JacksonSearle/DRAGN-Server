@@ -20,12 +20,3 @@ def build_tree(data, parent=None, path=''):
     for child in data['children']: build_tree(child, node, path)
     if parent: parent.add_child(node)
     else: return node
-
-def get_all_nodes(root):
-    nodes = []
-    if root:
-        if root.children == []:
-            nodes.append(root)
-        for child in root.children:
-            nodes += get_all_nodes(child)
-    return nodes
