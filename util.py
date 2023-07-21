@@ -44,15 +44,11 @@ def prompt_until_success(prompt, expected_structure):
         i += 1
     if valid_answer:
         dictionary = json.loads(json_str)
-        # print(f'{dictionary}\n\n')
+        print(f'{dictionary}\n\n')
         return dictionary
     else:
         print(f'ERROR: FAILED {num_tries} times\nPrompt: {prompt}')
         return None
-
-def format_time(curr_time):
-    formatted_time = time.strftime("%Y-%m-%d %H:%M:%S", curr_time)
-    return formatted_time
 
 def get_timeofday(curr_time):
     return curr_time.tm_hour*100 + curr_time.tm_min
@@ -62,7 +58,7 @@ def increase_time(curr_time, seconds):
     return time.localtime(new_time)
 
 def set_start_time(year, month, day, hour, minute, second):
-    start_time = time.struct_time((year, month, day, hour, minute, second, 1, 1, 1))
+    start_time = time.struct_time((year, month, day, hour, minute, second, 1, 1, 0))
     return start_time
 
 def time_prompt(curr_time):
