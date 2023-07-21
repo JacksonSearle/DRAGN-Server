@@ -1,16 +1,14 @@
 import math
-import json
 import numpy as np
 import re
 from tree import Node
 from numpy.linalg import norm
 from util import *
-from util import embed
 from time import mktime
 from memory import Memory
 
 class Agent:
-    def __init__(self, character_sheet, time, game):
+    def __init__(self, character_sheet, time, spawn):
         self.memory_stream = []
         self.name = character_sheet['name']
         self.age = character_sheet['age']
@@ -20,7 +18,7 @@ class Agent:
         self.prep_seeds(time)
         self.vision_radius = character_sheet['vision_radius']
         self.waking_hours = character_sheet['waking_hours']
-        self.spawn = game.lookup_places[character_sheet['spawn']]
+        self.spawn = spawn
 
         self.busy_time = 0
         self.dayplan = ''
@@ -29,8 +27,7 @@ class Agent:
 
         self.status = 'idle'
         self.last_observed = {}
-        #TODO: Put a real node object from the tree here
-        self.destination = Node("None name", "None path", {"x": 0, "y": 0, "z": 0})
+        self.destination = spawn
         self.conversation = None
         self.summary_description = None
         self.update_summary_description(time)
@@ -64,9 +61,6 @@ class Agent:
         distance = math.sqrt((x2 - x1)**2 + (y2 - y1)**2 + (z2 - z1)**2)
         return distance <= self.vision_radius
 
-    def prompt(self):
-        return self.summary_description +'\n'+ format_time(self.time) +'\n'+ self.status +'\n'+ self.memory_stream[-1].description() +'\n'+ self.revelant_context_summary
-
     def retrieve_memories(self,time,query,k=4):
         score = []
         arec = 1
@@ -91,7 +85,7 @@ class Agent:
         return self.summary_description_prompt(time, 'day', 50)
 
     def plan_day(self, time):
-        query = f'It is {format_time(time)}. What are {self.name}\'s plans today, given the following summary of what he did yesterday? Return a json object with one field, "plan": str'
+        query = f'{time_prompt(time)}. What are {self.name}\'s plans today, given the following summary of what {self.name} did yesterday? Return a json object with one field, "plan": str'
         prompt = '\n'.join([self.summary_description, query, self.yesterday_summary])
         expected_structure = {
             "plan": str
@@ -172,29 +166,14 @@ class Agent:
 
     
     def update_summary_description(self,time):
-        # Name
         name = f'Name: {self.name} (age: {self.age})'
-
-        # Innate traits
         innate_traits = f'Innate traits: {self.innate_traits}'
-
-        # Core characteristics
         core_characteristics = self.summary_description_prompt(time, 'core characteristics')
-
-        # Current daily occupation
         daily_occupation = self.summary_description_prompt(time, 'current daily occupation')
-
-        # Feelings about his recent progress in life
         recent_progress_in_life = self.summary_description_prompt(time, 'feelings about their recent progress in life')
-
-        self.summary_description = '\n'.join([name,
-                                            innate_traits,
-                                            core_characteristics,
-                                            daily_occupation,
-                                            recent_progress_in_life])
+        self.summary_description = '\n'.join([name, innate_traits, core_characteristics, daily_occupation, recent_progress_in_life])
 
     def summary_description_prompt(self, time, text, k=4):
-        # Generate prompt
         query = f'How would one describe {self.name}\'s {text} given the following statements? Return a json with one field "description": str'
         memories = self.retrieve_memories(time, query, k)
         prompt = '\n'.join([query] + [memory.description for memory in memories])
@@ -209,7 +188,6 @@ class Agent:
         return f'{self.name}\'s status: {self.status}'
     
     def react(self, current_time, memories):
-        # Generate prompt
         relevant = [self.retrieve_memories(current_time, m.description, k=3) for m in memories]
         relevant_context = f'{self.name} has observed the following:\n'
         for i in range(len(memories)): relevant_context += f'{i+1}: {memories[i].description}\n'
@@ -228,7 +206,7 @@ class Agent:
         
         self.status = dictionary['interact']
         self.busy_time = dictionary['duration'] * 60
-        return dictionary['choice'], dictionary['interact']
+        return dictionary['choice']-1, dictionary['interact']
     
     def converse(self, other_agent, current_time):
         recent_memory = self.memory_stream[-1]
@@ -252,5 +230,3 @@ class Agent:
         dictionary = prompt_until_success(prompt, expected_structure)
         print("CONVERSING")
         return dictionary['conversation']
-
-    
