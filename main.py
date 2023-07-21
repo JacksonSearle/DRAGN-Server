@@ -4,7 +4,7 @@ import util
 from game import Game
 from pathlib import Path
 # import cProfile
-#from init_unreal import content_path
+# from init_unreal import content_path
 from config import path
 
 def update_world_tree():
@@ -79,8 +79,6 @@ def load_game(time_step):
     return game
 
 
-    
-
 def main():
     game_states = 5 # number of time steps
     time_step = 600 # seconds
@@ -88,12 +86,6 @@ def main():
     game = load_game(time_step)
     game.save_index = util.get_index()
     data = gather_initial_data(game)
-
-    # i = int(state)
-    # print(i)
-    # print(game.time)
-    # update_server_info(i, game)
-    # send_server_info(i, data, game, game_states)
 
     for i in range(game_states):
         print(f'-------EPOCH: {i}------')
