@@ -25,7 +25,8 @@ class Game:
 
     def lookup_places(self,node):
         if not node.children: self.places[node.path] = node
-        for child in node.children: self.places.update(self.lookup_places(child))
+        else:
+            for child in node.children: self.places.update(self.lookup_places(child))
     
     def initial_json(self):
         data = {}
