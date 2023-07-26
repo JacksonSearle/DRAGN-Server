@@ -8,10 +8,10 @@ from pathlib import Path
 from config import path
 
 def update_world_tree():
-    with open(Path(path + 'world_tree.json'), 'r') as file: places = json.load(file)
+    with open(Path(path + 'world_tree.json'), 'r') as file: known = json.load(file)
     with open(Path(path + 'game_info/on_startup.json'), 'r') as file: newLocations = json.load(file)
     for place in newLocations['allDestinations']:
-        layer = places
+        layer = known
         for n in range(len(place['namesId'])-1):
             if 'name' not in layer: 
                 layer['name'] = place['namesId'][n]
@@ -20,9 +20,9 @@ def update_world_tree():
             layer = layer['children']
 
             found = False
-            for c in layer:
-                if c['name'] == place['namesId'][n+1]: 
-                    layer = layer[layer.index(c)]
+            for entry in layer:
+                if entry['name'] == place['namesId'][n+1]: 
+                    layer = layer[layer.index(entry)]
                     found = True
             if not found: 
                 layer.append({'children': []})
@@ -31,7 +31,7 @@ def update_world_tree():
         layer['name'] = place['namesId'][-1]
         layer['position'] = list(place['location'].values())
     
-    with open(Path(path + 'world_tree.json'), 'w') as file: json.dump(places, file)
+    with open(Path(path + 'world_tree.json'), 'w') as file: json.dump(known, file)
 
 def gather_initial_data(game):
     # Give original json to client
@@ -42,16 +42,16 @@ def gather_initial_data(game):
 def update_server_info(game, do_pos=True):
     # Reading a JSON file
     with open(Path(path + 'game_info/to_server.json'), 'r') as file:
-        c_data = json.load(file)
-    if c_data['save']:
+        front_data = json.load(file)
+    if front_data['save']:
         game.save()
         return True
-    c_agents = c_data['agents']
+    front_agents = front_data['agents']
 
     # Update the server agent's position
     if do_pos:
-        for c_agent, s_agent in zip(c_agents, game.agents):
-            s_agent.position = c_agent['position']
+        for front_agent, agent in zip(front_agents, game.agents):
+            agent.position = front_agent['position']
     
 def send_server_info(data, game):
     # Calculate the next step in the game
@@ -66,8 +66,8 @@ def send_server_info(data, game):
 
 def load_game(time_step):
     with open(Path(path + 'game_info/to_server.json'), 'r') as file:
-        c_data = json.load(file)
-    index = c_data['load_file']
+        front_data = json.load(file)
+    index = front_data['load_file']
     if index == -1:
         update_world_tree()
         game = Game(time_step=time_step)
