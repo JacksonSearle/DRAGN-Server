@@ -24,9 +24,9 @@ class Game:
         self.get_save_index()
 
     def lookup_places(self,node):
-        self.places[node.path] = node
-        if node.children:
-            for child in node.children: self.lookup_places(child)
+        for child in node.children: 
+            self.places[child.path] = child
+            if node.children: self.lookup_places(child)
     
     def initial_json(self):
         data = {}
@@ -47,6 +47,7 @@ class Game:
         for character_sheet in character_sheets:
             agents.append(Agent(character_sheet, self.time, self.places[character_sheet['spawn']]))
         return agents
+
 
     def update(self, data):
         for i, agent in enumerate(self.agents):
@@ -84,7 +85,7 @@ class Game:
         choices = []
         #TODO: Front-end determines the objects seen by the agent
         for place in self.places.values():
-            if agent.is_within_range(place.location):
+            if place.location['x'] and agent.is_within_range(place.location):
                 # Make an observation for that thing if its state is different or newly observed
                 if place.name not in agent.last_observed or agent.last_observed[place.name] != place.state:
                     agent.last_observed[place.name] = place.state
@@ -110,7 +111,7 @@ class Game:
                 #TODO: prompts do not consistently produce statuses that fit with this sentence structure, e.g "Bob is check on Alice", "Alice is Alice would chat"
                 description = f'{other_agent.name}\'s plan is to {other_agent.status}'
                 memory = Memory(self.time, description)
-                agent.memory_stream.append(memory)
+                agent.add_memory(memory)
                 
                 # Choose whether or not to react to each observation
                 react, interact = agent.react(self.time, [memory])
@@ -128,7 +129,7 @@ class Game:
     def execute_plan(self,agent,destination=None):
         if agent.destination: agent.destination.state = "idle"
         if destination: agent.destination = destination
-        else: agent.destination = self.choose_location(agent)
+        else: agent.destination = self.choose_location(agent) 
         prompt = f'{agent.name} is {agent.status} at the {agent.destination.name}. Generate a JSON dictionary object with a single field, "state": string, which describes the state the {agent.destination.name} is in.'
         expected_structure = {
             "state": str,
@@ -144,7 +145,7 @@ class Game:
             root = self.root
 
         choices = f'0: {location.name}'
-        for c in range(len(root.children)): 
+        for c in range(len(root.children)):  
             s = f'{c+1}: {root.children[c].name}'
             choices = '\n'.join([choices,s])
         query = f'Given the place(s) above, write a JSON dictionary object with "choice": int. Choice should be one of the indices shown above. Make its value the index of the place which is the most reasonable for {agent.name} to do the following activity: {agent.status}'
