@@ -1,8 +1,7 @@
 import json
 import time
-import os.path
 
-def pathfinding(dest_x, dest_y, dest_z, x, y, z, step=300):
+def pathfinding(dest_x, dest_y, dest_z, x, y, z, step=100):
     # Calculate the difference between current position and destination
     dx = dest_x - x
     dy = dest_y - y
@@ -33,26 +32,20 @@ def pathfinding(dest_x, dest_y, dest_z, x, y, z, step=300):
 def update():
     # Reading a JSON file
     with open('game_info/to_client.json', 'r') as file:
-        s_data = json.load(file)
+        data = json.load(file)
     with open('game_info/to_server.json', 'r') as file:
-        c_data = json.load(file)
+        front_data = json.load(file)
 
     # Modifying data
-    for s_agent, c_agent in zip(s_data['agents'], c_data['agents']):
-        try:
-            dest_x, dest_y, dest_z = s_agent['destination']['location']['x'], s_agent['destination']['location']['y'], s_agent['destination']['location']['z']
-        except:
-            print(f'S_DATA\n\n{s_data}\n\nS_AGENT\n\n{s_agent}')
-        x, y, z = c_agent['position']['x'], c_agent['position']['y'], c_agent['position']['z']
+    for agent, front_agent in zip(data['agents'], front_data['agents']):
+        dest_x, dest_y, dest_z = agent['destination']['location']['x'], agent['destination']['location']['y'], agent['destination']['location']['z']
+        x, y, z = front_agent['position']['x'], front_agent['position']['y'], front_agent['position']['z']
         x, y, z = pathfinding(dest_x, dest_y, dest_z, x, y, z)
-        if s_data['spawn']:
-            c_agent['position'] = {"x": s_data['spawn_location'], "y": s_data['spawn_location'], "z": s_data['spawn_location']}
-        else:
-            c_agent['position'] = {"x": x, "y": y, "z": z}
+        front_agent['position'] = {"x": x, "y": y, "z": z}
 
     # Writing to a JSON file
     with open('game_info/to_server.json', 'w') as file:
-        json.dump(c_data, file)
+        json.dump(front_data, file)
 
 while(True):
     # Check every _ seconds
