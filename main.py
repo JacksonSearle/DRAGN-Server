@@ -4,7 +4,7 @@ import util
 from game import Game
 from pathlib import Path
 # import cProfile
-# from init_unreal import content_path
+#from init_unreal import content_path
 from config import path
 
 def update_world_tree():
@@ -25,12 +25,11 @@ def update_world_tree():
                     layer = layer[layer.index(c)]
                     found = True
             if not found: 
-                layer.append({})
+                layer.append({'children': []})
                 layer = layer[-1]
             
         layer['name'] = place['namesId'][-1]
         layer['position'] = list(place['location'].values())
-        if 'children' not in layer: layer['children'] = []
     
     with open(Path(path + 'world_tree.json'), 'w') as file: json.dump(places, file)
 
@@ -40,7 +39,7 @@ def gather_initial_data(game):
     with open(Path(path + 'game_info/to_client.json'), 'w') as file: json.dump(data, file)
     return data
 
-def update_server_info(i, game):
+def update_server_info(game, do_pos=True):
     # Reading a JSON file
     with open(Path(path + 'game_info/to_server.json'), 'r') as file:
         c_data = json.load(file)
@@ -50,11 +49,11 @@ def update_server_info(i, game):
     c_agents = c_data['agents']
 
     # Update the server agent's position
-    if i != 0:
+    if do_pos:
         for c_agent, s_agent in zip(c_agents, game.agents):
             s_agent.position = c_agent['position']
     
-def send_server_info(i, data, game, game_states):
+def send_server_info(data, game):
     # Calculate the next step in the game
     game.update_agents()
         
@@ -79,27 +78,35 @@ def load_game(time_step):
     return game
 
 
+    
+
 def main():
-    game_states = 5 # number of time steps
+    game_states = 50 # number of time steps
     time_step = 600 # seconds
 
     game = load_game(time_step)
     game.save_index = util.get_index()
     data = gather_initial_data(game)
 
+    # i = int(state)
+    # print(i)
+    # print(game.time)
+    # update_server_info(i, game)
+    # send_server_info(i, data, game, game_states)
+
     for i in range(game_states):
         print(f'-------EPOCH: {i}------')
         if i > 0:
             data['spawn'] = False
         print(game.time)
-        stop = update_server_info(i, game)
+        stop = update_server_info(game, i>0)
         if stop:
             break
-        send_server_info(i, data, game, game_states)
+        send_server_info(data, game)
         print()
         # Delay the specified time
         # time.sleep(1)​
     
     print('Done with simulation')
 
-main()
+#main()
