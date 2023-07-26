@@ -166,14 +166,29 @@ class Agent:
 
     
     def update_summary_description(self,time):
+        # Name
         name = f'Name: {self.name} (age: {self.age})'
+
+        # Innate traits
         innate_traits = f'Innate traits: {self.innate_traits}'
+
+        # Core characteristics
         core_characteristics = self.summary_description_prompt(time, 'core characteristics')
+
+        # Current daily occupation
         daily_occupation = self.summary_description_prompt(time, 'current daily occupation')
+
+        # Feelings about his recent progress in life
         recent_progress_in_life = self.summary_description_prompt(time, 'feelings about their recent progress in life')
-        self.summary_description = '\n'.join([name, innate_traits, core_characteristics, daily_occupation, recent_progress_in_life])
+
+        self.summary_description = '\n'.join([name,
+                                            innate_traits,
+                                            core_characteristics,
+                                            daily_occupation,
+                                            recent_progress_in_life])
 
     def summary_description_prompt(self, time, text, k=4):
+        # Generate prompt
         query = f'How would one describe {self.name}\'s {text} given the following statements? Return a json with one field "description": str'
         memories = self.retrieve_memories(time, query, k)
         prompt = '\n'.join([query] + [memory.description for memory in memories])
@@ -188,6 +203,7 @@ class Agent:
         return f'{self.name}\'s status: {self.status}'
     
     def react(self, current_time, memories):
+        # Generate prompt
         relevant = [self.retrieve_memories(current_time, m.description, k=3) for m in memories]
         relevant_context = f'{self.name} has observed the following:\n'
         for i in range(len(memories)): relevant_context += f'{i+1}: {memories[i].description}\n'
