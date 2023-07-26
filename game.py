@@ -18,15 +18,15 @@ class Game:
 
         with open(Path(path + 'world_tree.json'), 'r') as file:
             self.root = build_tree(json.load(file))
-        self.places = {self.root.path: self.root}
+        self.places = {}
         self.lookup_places(self.root)
         self.agents = self.make_agents()
         self.get_save_index()
 
     def lookup_places(self,node):
-        if not node.children: self.places[node.path] = node
-        else:
-            for child in node.children: self.places.update(self.lookup_places(child))
+        self.places[node.path] = node
+        if node.children:
+            for child in node.children: self.lookup_places(child)
     
     def initial_json(self):
         data = {}
