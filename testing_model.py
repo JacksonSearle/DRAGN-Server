@@ -51,7 +51,7 @@ def model(messages):
     if os.path.isfile(filename):
         with open(filename, 'r') as f:
             data = json.load(f)
-            call_count = data['count']
+            call_count = data['text_count']
             last_call_date = datetime.datetime.strptime(data['date'], '%Y-%m-%d').date()
     else:
         call_count = 0
@@ -80,9 +80,12 @@ def model(messages):
         # Increment and save the count
         call_count += 1
         with open(filename, 'w') as f:
-            json.dump({'count': call_count, 'date': str(last_call_date)}, f)
+            json.dump({'image_count': data['image_count'], 'text_count': call_count, 'date': str(last_call_date)}, f)
         # print(f'API Call: {messages[1]["content"]}\n')
         return response_text
 
     else:
         print(f"API call limit of {MAX_API_CALLS} per day reached. Please wait until tomorrow.")
+
+
+query_model("Who was the first president of the USA?", '')
