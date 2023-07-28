@@ -49,9 +49,10 @@ def update_server_info(game, do_pos=True):
     front_agents = front_data['agents']
 
     # Update the server agent's position
-    if do_pos:
-        for front_agent, agent in zip(front_agents, game.agents):
-            agent.position = front_agent['position']
+    for front_agent, agent in zip(front_agents, game.agents):
+        if do_pos: agent.position = front_agent['position']
+        agent.observed_objects = front_agent['objects']
+        agent.observed_agents = front_agent['agents']
     
 def send_server_info(data, game):
     # Calculate the next step in the game
