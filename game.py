@@ -32,11 +32,13 @@ class Game:
         data = {}
         data['save_index'] = self.save_index
         data['spawn'] = True
+        data['player'] = {'quests':[],'npc_response':""}
         data['agents'] = []
         for i, agent in enumerate(self.agents):
             data['agents'].append({})
             data['agents'][i]['name'] = agent.name
             data['agents'][i]['status'] = agent.status
+            data['agents'][i]['conversing_with'] = None
             data['agents'][i]['destination'] = agent.destination.location
             data['agents'][i]['conversation'] = agent.conversation
             data['agents'][i]['spawn_location'] = agent.spawn.location
@@ -53,11 +55,20 @@ class Game:
         for i, agent in enumerate(self.agents):
             data['agents'][i]['status'] = agent.status
             data['agents'][i]['destination'] = {"nameId": agent.destination.name, "location": agent.destination.location}
+            data['agents'][i]['conversing_with'] = agent.conversing_with
             data['agents'][i]['conversation'] = agent.conversation
 
     def update_agents(self):
         self.time = increase_time(self.time, self.time_step)
+        with open(Path(path + 'game_info/to_server.json'), 'r') as file: 
+            front_data = json.load(file)
         for agent in self.agents:
+            while front_data['player']['agent'] and front_data['player']['toAgent'] == "":
+                time.sleep(.5)
+                with open(Path(path + 'game_info/to_server.json'), 'r') as file: 
+                    front_data = json.load(file)
+            
+            if front_data['player']['toAgent'] != "": self.generate_quest(front_data['player'])
             self.update_agent(agent)
         # with Pool(processes=10) as pool:
         #     pool.map(self.update_agent, self.agents)
@@ -69,12 +80,13 @@ class Game:
             agent.plan_day(self.time)
             self.execute_plan(agent)
         #Call reflection if agent is going to bed, or call hour/minute plans if during waking hours
-        elif timeofday == agent.waking_hours["down"]: agent.reflect(self.time)
+        elif timeofday == agent.waking_hours["down"]: agent.end_day(self.time)
         elif agent.waking_hours["up"] < timeofday < agent.waking_hours["down"]:
             if not self.perceive_objects(agent):
                 self.perceive_agents(agent)
             if agent.busy_time <= 0:
                 agent.conversation = None
+                agent.conversing_with = None
                 if timeofday%100 == 0: agent.plan_hour(self.time)
                 else: agent.plan_next(self.time)
                 self.execute_plan(agent)
@@ -83,17 +95,15 @@ class Game:
     def perceive_objects(self,agent):
         perceived = []
         choices = []
-        #TODO: Front-end determines the objects seen by the agent
-        for place in self.places.values():
-            if place.location['x'] and agent.is_within_range(place.location):
-                # Make an observation for that thing if its state is different or newly observed
-                if place.name not in agent.last_observed or agent.last_observed[place.name] != place.state:
-                    agent.last_observed[place.name] = place.state
-                    description = f'{place.name} is {place.state}'
-                    memory = Memory(self.time, description)
-                    agent.add_memory(memory)
-                    perceived.append(memory)
-                    choices.append(place)
+        for place in agent.observed_objects:
+            # Make an observation for that thing if its state is different or newly observed
+            if place.name not in agent.last_observed or agent.last_observed[place.name] != place.state:
+                agent.last_observed[place.name] = place.state
+                description = f'{place.name} is {place.state}'
+                memory = Memory(self.time, description)
+                agent.add_memory(memory)
+                perceived.append(memory)
+                choices.append(place)
         # Choose whether or not to react to each observation
         if agent.conversation == None and len(perceived) > 0:
             react, interact = agent.react(self.time, perceived)
@@ -104,26 +114,24 @@ class Game:
         return False
     
     def perceive_agents(self,agent):
-        for other_agent in self.agents:
-            # Make sure an agent isn't talking to themselves
-            if agent is not other_agent and agent.is_within_range(other_agent.location):
-                # Make both agents see each other
-                #TODO: prompts do not consistently produce statuses that fit with this sentence structure, e.g "Bob is check on Alice", "Alice is Alice would chat"
-                description = f'{other_agent.name}\'s plan is to {other_agent.status}'
+        for other_agent in agent.observed_agents:
+            # Make both agents see each other
+            #TODO: prompts do not consistently produce statuses that fit with this sentence structure, e.g "Bob is check on Alice", "Alice is Alice would chat"
+            description = f'{other_agent.name}\'s plan is to {other_agent.status}'
+            memory = Memory(self.time, description)
+            agent.add_memory(memory)
+            
+            # Choose whether or not to react to each observation
+            react, interact = agent.react(self.time, [memory])
+            if react>=0:
+                agent.status = interact
+                # make a memory for the person they are talking to
+                description = agent.status
                 memory = Memory(self.time, description)
-                agent.add_memory(memory)
-                
-                # Choose whether or not to react to each observation
-                react, interact = agent.react(self.time, [memory])
-                if react>=0:
-                    agent.status = interact
-                    # make a memory for the person they are talking to
-                    description = agent.status
-                    memory = Memory(self.time, description)
-                    other_agent.add_memory(memory)
-                    other_agent.status = description
-                    # generate dialogue
-                    self.conversation(agent, other_agent)
+                other_agent.add_memory(memory)
+                other_agent.status = description
+                # generate dialogue
+                self.conversation(agent, other_agent)
 
     
     def execute_plan(self,agent,destination=None):
@@ -132,26 +140,30 @@ class Game:
         else: agent.destination = self.choose_location(agent) 
         prompt = f'{agent.name} is {agent.status} at the {agent.destination.name}. Generate a JSON dictionary object with a single field, "state": string, which describes the state the {agent.destination.name} is in.'
         expected_structure = {
-            "state": str,
+            "state": str
         }
         dictionary = prompt_until_success(prompt, expected_structure)
         agent.destination.state = dictionary['state']
     
-    def choose_location(self,agent,root=None):
+    def choose_location(self,agent,root=None,quest=None):
         if root: location = root
         else:
             #Remaining at current location is an option at the first level of traversal
             location = agent.destination
             root = self.root
 
-        choices = f'0: {location.name}'
+        choices = f'0: {location.name}' if not quest else ''
         for c in range(len(root.children)):  
             s = f'{c+1}: {root.children[c].name}'
             choices = '\n'.join([choices,s])
-        query = f'Given the place(s) above, write a JSON dictionary object with "choice": int. Choice should be one of the indices shown above. Make its value the index of the place which is the most reasonable for {agent.name} to do the following activity: {agent.status}'
+        
+        query = f'Given the place(s) above, write a JSON dictionary object with "choice": int. Choice should be one of the indices shown above.'
+        if quest: query = ' '.join([query,f'Make its value the index of the place which best fits the following quest description: {quest}'])
+        else: query = ' '.join([query,f'Make its value the index of the place which is the most reasonable for {agent.name} to do the following activity: {agent.status}'])
+        
         prompt = '\n'.join([choices, query])
         expected_structure = {
-            "choice": int,
+            "choice": int
         }
         dictionary = prompt_until_success(prompt, expected_structure)
         index = dictionary["choice"]
@@ -168,7 +180,9 @@ class Game:
         conversation = agent.converse(other_agent, self.time)
         # TODO: could we set their destination to a halfway point between the agents?
         agent.conversation, other_agent.conversation = conversation, conversation
-        agent.destination.location, other_agent.destination.location = None, None
+        agent.conversing_with, other_agent.conversing_with = other_agent.name, agent.name
+        agent.destination, other_agent.destination = None, None
+
 
         conversation_description = self.create_conversation_description(conversation)
         shared_memory = Memory(self.time, conversation_description)
@@ -183,6 +197,45 @@ class Game:
         dictionary = prompt_until_success(message, expected_structure)
         return dictionary["description"]
     
+
+    def generate_quest(self,player):
+        intention = player['toAgent']
+        agent = self.agents[0]
+        for a in self.agents:
+            if a.name == player['agent']:
+                agent = a
+                break
+        memories = agent.retrieve_memories(self.time, intention)
+        context = f'{agent.name} is talking to the player, who has just said the following: {intention}\n{agent.name} remembers the following: {[m.description for m in memories]}'
+        prompt = f'{context}\nGenerate a quest that {agent.name} could give to the player, which would interest the player. Give your quest as a JSON dictionary object with three fields, "name": str, "type": int, and "description": str. "name" should be the quest name. "description" should be {agent.name}\'s words describing the quest objective. "type" denotes the objective of the quest, and should be one of three numbers: 1 for grabbing an item, 2 for visiting a location, or 3 for fighting enemies.'
+        expected_structure = {
+            "name": str,
+            "type": int,
+            "description": str
+        }
+        quest = prompt_until_success(prompt, expected_structure)
+        if not 1<=quest['type']<=3: quest['type'] = 0
+        
+        location = self.choose_location(None,self.root,quest['description'])
+        prompt = f'The following is a quest description: {quest["description"]}\nThe following is the location where this quest should be done: {location.name}\nGiven this quest location, give a revised quest description that mentions the quest location. Give your answer as a JSON dictionary object with one field, "description": str.'
+        expected_structure = {
+            "description": str
+        }
+        dictionary = prompt_until_success(prompt, expected_structure)
+        quest['description'] = dictionary['description']
+        quest['location'] = location.location
+        quest['source'] = agent.name
+
+        memory = Memory(self.time,f"Told the player about the following quest: {quest['description']}")
+        agent.add_memory(memory)
+
+        with open(Path(path + 'game_info/to_client.json'), 'r') as file:
+            data = json.load(file)
+        data['player']['quests'].append(quest)
+        with open(Path(path + 'game_info/to_client.json'), 'w') as file:
+            json.dump(data, file)
+
+
     def get_save_index(self):
         self.save_index = get_index()
 
