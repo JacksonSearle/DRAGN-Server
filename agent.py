@@ -31,6 +31,8 @@ class Agent:
         self.observed_agents = []
         self.destination = spawn
         self.conversation = None
+        self.conversing_with = None
+
         self.summary_description = None
         self.update_summary_description(time)
         self.reflect_buffer = 0
@@ -127,6 +129,8 @@ class Agent:
         self.last_observed.clear()
         for m in self.memory_stream:
             if m.type == "Observation": self.memory_stream.remove(m)
+        self.conversation = None
+        self.conversing_with = None
         self.reflect(time)
         
 
