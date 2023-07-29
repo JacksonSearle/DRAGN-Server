@@ -27,6 +27,8 @@ class Agent:
 
         self.status = 'idle'
         self.last_observed = {}
+        self.observed_objects = []
+        self.observed_agents = []
         self.destination = spawn
         self.conversation = None
         self.summary_description = None
@@ -98,7 +100,7 @@ class Agent:
         dayplan = f'{self.name}\'s daily plan: ' + self.dayplan
         lastplan = f'{self.name}\'s plan for the last hour: ' + self.hourplans[-1]
         query = f'Given the context above, what does {self.name} plan to do this hour? Return a json object with one field, "plan": str'
-        prompt = '\n'.join([dayplan, lastplan, query])
+        prompt = '\n'.join([time_prompt(time), dayplan, lastplan, query])
         expected_structure = {
             "plan": str
         }
