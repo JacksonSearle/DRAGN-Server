@@ -26,6 +26,7 @@ class Game:
     def lookup_places(self,node):
         for child in node.children: 
             self.places[child.path] = child
+            self.places[child.name] = child
             if node.children: self.lookup_places(child)
     
     def initial_json(self):
@@ -39,7 +40,7 @@ class Game:
             data['agents'][i]['name'] = agent.name
             data['agents'][i]['status'] = agent.status
             data['agents'][i]['conversing_with'] = None
-            data['agents'][i]['destination'] = agent.destination.location
+            data['agents'][i]['destination'] = {"nameId": agent.destination.name, "location": agent.destination.location}
             data['agents'][i]['conversation'] = agent.conversation
             data['agents'][i]['spawn_location'] = agent.spawn.location
         return data
@@ -59,7 +60,6 @@ class Game:
             data['agents'][i]['conversation'] = agent.conversation
 
     def update_agents(self):
-        self.time = increase_time(self.time, self.time_step)
         with open(Path(path + 'game_info/to_server.json'), 'r') as file: 
             front_data = json.load(file)
         for agent in self.agents:
@@ -72,6 +72,8 @@ class Game:
             self.update_agent(agent)
         # with Pool(processes=10) as pool:
         #     pool.map(self.update_agent, self.agents)
+
+        self.time = increase_time(self.time, self.time_step)
         
 
     def update_agent(self, agent):
@@ -96,14 +98,15 @@ class Game:
         perceived = []
         choices = []
         for place in agent.observed_objects:
+            state = self.places[place].state
             # Make an observation for that thing if its state is different or newly observed
-            if place.name not in agent.last_observed or agent.last_observed[place.name] != place.state:
-                agent.last_observed[place.name] = place.state
-                description = f'{place.name} is {place.state}'
+            if place not in agent.last_observed or agent.last_observed[place] != state:
+                agent.last_observed[place] = state
+                description = f'{place} is {state}'
                 memory = Memory(self.time, description)
                 agent.add_memory(memory)
                 perceived.append(memory)
-                choices.append(place)
+                choices.append(self.places[place])
         # Choose whether or not to react to each observation
         if agent.conversation == None and len(perceived) > 0:
             react, interact = agent.react(self.time, perceived)
@@ -198,16 +201,32 @@ class Game:
         return dictionary["description"]
     
 
-    def generate_quest(self,player):
-        intention = player['toAgent']
+    def generate_quest(self,player,agent_coherence=True,use_intention=True):
         agent = self.agents[0]
         for a in self.agents:
             if a.name == player['agent']:
                 agent = a
-                break
-        memories = agent.retrieve_memories(self.time, intention)
-        context = f'{agent.name} is talking to the player, who has just said the following: {intention}\n{agent.name} remembers the following: {[m.description for m in memories]}'
-        prompt = f'{context}\nGenerate a quest that {agent.name} could give to the player, which would interest the player. Give your quest as a JSON dictionary object with three fields, "name": str, "type": int, and "description": str. "name" should be the quest name. "description" should be {agent.name}\'s words describing the quest objective. "type" denotes the objective of the quest, and should be one of three numbers: 1 for grabbing an item, 2 for visiting a location, or 3 for fighting enemies.'
+                break      
+
+        if agent_coherence:
+            if use_intention: 
+                memories = agent.retrieve_memories(self.time, player['toAgent'])
+                context = f'The player has an interest in the following: {player["toAgent"]}\n'
+                prompt = f', and that the player would be interested in.\n'
+            else: 
+                memories = agent.retrieve_memories(self.time, f"Somebody is asking {agent.name} for a quest")
+                context = ''
+                prompt = '.\n'
+            name = agent.name
+            context += f'{name} is talking to the player, and remembers the following:\n'
+            for m in memories: context += f'{m.description}\n'
+            prompt = context + f'Generate a quest that {name} would know about or want done' + prompt
+        else: 
+            name = "an NPC"
+            if use_intention: prompt = f'An NPC is talking to the player, who has an interest in the following: {player["toAgent"]}\nGenerate a quest that the player would be interested in.\n'
+            else: prompt = f'Generate a quest for a player in a small village surrounded by a forest, a field, and a mountain.'
+
+        prompt += f'Give your quest as a JSON dictionary object with three fields, "name": str, "type": int, and "description": str. "name" should be the quest name. "description" should be {name}\'s words describing the quest objective. "type" denotes the objective of the quest, and should be one of three numbers: 1 for grabbing an item, 2 for visiting a location, or 3 for fighting enemies.'
         expected_structure = {
             "name": str,
             "type": int,
@@ -225,13 +244,14 @@ class Game:
         quest['description'] = dictionary['description']
         quest['location'] = location.location
         quest['source'] = agent.name
+        quest['state'] = 0
 
         memory = Memory(self.time,f"Told the player about the following quest: {quest['description']}")
         agent.add_memory(memory)
 
         with open(Path(path + 'game_info/to_client.json'), 'r') as file:
             data = json.load(file)
-        data['player']['quests'].append(quest)
+        data['player']['quests'][quest['name']] = quest
         with open(Path(path + 'game_info/to_client.json'), 'w') as file:
             json.dump(data, file)
 
