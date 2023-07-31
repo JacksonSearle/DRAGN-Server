@@ -31,7 +31,6 @@ class Game:
     
     def initial_json(self):
         data = {}
-        data['save_index'] = self.save_index
         data['spawn'] = True
         data['player'] = {'quests':[],'npc_response':""}
         data['agents'] = []
