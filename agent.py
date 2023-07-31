@@ -1,7 +1,6 @@
 import math
 import numpy as np
 import re
-from tree import Node
 from numpy.linalg import norm
 from util import *
 from time import mktime
@@ -22,7 +21,7 @@ class Agent:
 
         self.busy_time = 0
         self.dayplan = ''
-        self.hourplans = ['Sleeping.']
+        self.hourplans = []
         self.yesterday_summary = ''
 
         self.status = 'idle'
@@ -213,7 +212,7 @@ class Agent:
         relevant = [self.retrieve_memories(current_time, m.description, k=3) for m in memories]
         relevant_context = f'{self.name} has observed the following:\n'
         for i in range(len(memories)): relevant_context += f'{i+1}: {memories[i].description}\n'
-        relevant_context = "Relevant Context:\n"
+        relevant_context += "Relevant Context:\n"
         relevant_context += '\n'.join([m.description for rel in relevant for m in rel])
 
         question = f'Based on the context above, give a json dictionary object with "choice": int, "interact": string, and "duration": int. Choice should be one of the indices shown above, or -1. Make its value the index of the observation which {self.name} should react to (or -1 for no reaction). The interact string will describe how {self.name} interacts to the chosen observation. The duration int shows how long {self.name} interacts with that object. Duration should be in minutes, somewhere between 5 and 15 minutes.'
