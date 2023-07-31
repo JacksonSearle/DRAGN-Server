@@ -82,8 +82,8 @@ def load_game(time_step):
     
 
 def main():
-    game_states = 50 # number of time steps
-    time_step = 600 # seconds
+    game_states = 5 # number of time steps
+    time_step = 1800 # seconds
 
     game = load_game(time_step)
     game.save_index = util.get_index()
