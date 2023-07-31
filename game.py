@@ -250,7 +250,8 @@ class Game:
 
         with open(Path(path + 'game_info/to_client.json'), 'r') as file:
             data = json.load(file)
-        data['player']['quests'][quest['name']] = quest
+        data['player']['quests'].append(quest)
+        data['player']['npc_response'] = quest['description']
         with open(Path(path + 'game_info/to_client.json'), 'w') as file:
             json.dump(data, file)
 
