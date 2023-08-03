@@ -69,7 +69,7 @@ class Game:
                     front_data = json.load(file)
             
             if front_data['player']['toAgent'] != "": self.generate_quest(front_data['player'])
-            self.generate_quest({'agent':"Eve", 'toAgent':"I want to find treasure!"})
+            #self.generate_quest({'agent':"Eve", 'toAgent':"I want to find treasure!"})
                 
             self.update_agent(agent)
         # with Pool(processes=10) as pool:
