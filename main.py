@@ -48,7 +48,6 @@ def update_server_info(game, do_pos=True):
     front_agents = front_data['agents']
 
     for front_agent, agent in zip(front_agents, game.agents):
-        if do_pos: agent.position = front_agent['position']
         agent.observed_objects = front_agent['objects']
         agent.observed_agents = front_agent['agents']
     return False
@@ -96,4 +95,4 @@ def main():
     
     print('Done with simulation')
 
-#main()
+main()

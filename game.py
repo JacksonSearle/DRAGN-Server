@@ -7,6 +7,7 @@ from agent import Agent
 from memory import Memory
 from tree import build_tree
 from character_sheets import character_sheets
+from experiment import increment_test
 
 from config import path
 #from init_unreal import content_path
@@ -68,6 +69,8 @@ class Game:
                     front_data = json.load(file)
             
             if front_data['player']['toAgent'] != "": self.generate_quest(front_data['player'])
+            self.generate_quest({'agent':"Eve", 'toAgent':"I want to find treasure!"})
+                
             self.update_agent(agent)
         # with Pool(processes=10) as pool:
         #     pool.map(self.update_agent, self.agents)
@@ -116,24 +119,25 @@ class Game:
         return False
     
     def perceive_agents(self,agent):
-        for other_agent in agent.observed_agents:
-            # Make both agents see each other
-            #TODO: prompts do not consistently produce statuses that fit with this sentence structure, e.g "Bob is check on Alice", "Alice is Alice would chat"
-            description = f'{other_agent.name}\'s plan is to {other_agent.status}'
-            memory = Memory(self.time, description)
-            agent.add_memory(memory)
-            
-            # Choose whether or not to react to each observation
-            react, interact = agent.react(self.time, [memory])
-            if react>=0:
-                agent.status = interact
-                # make a memory for the person they are talking to
-                description = agent.status
+        for other_agent in self.agents:
+            if other_agent.name in agent.observed_agents:
+                # Make both agents see each other
+                #TODO: prompts do not consistently produce statuses that fit with this sentence structure, e.g "Bob is check on Alice", "Alice is Alice would chat"
+                description = f'{other_agent.name}\'s plan is to {other_agent.status}'
                 memory = Memory(self.time, description)
-                other_agent.add_memory(memory)
-                other_agent.status = description
-                # generate dialogue
-                self.conversation(agent, other_agent)
+                agent.add_memory(memory)
+                
+                # Choose whether or not to react to each observation
+                react, interact = agent.react(self.time, [memory])
+                if react>=0:
+                    agent.status = interact
+                    # make a memory for the person they are talking to
+                    description = agent.status
+                    memory = Memory(self.time, description)
+                    other_agent.add_memory(memory)
+                    other_agent.status = description
+                    # generate dialogue
+                    self.conversation(agent, other_agent)
 
     
     def execute_plan(self,agent,destination=None):
@@ -200,7 +204,8 @@ class Game:
         return dictionary["description"]
     
 
-    def generate_quest(self,player,agent_coherence=True,use_intention=True):
+    def generate_quest(self,player):
+        agent_coherence,use_intention = increment_test()
         agent = self.agents[0]
         for a in self.agents:
             if a.name == player['agent']:

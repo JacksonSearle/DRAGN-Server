@@ -21,7 +21,7 @@ class Agent:
 
         self.busy_time = 0
         self.dayplan = ''
-        self.hourplans = []
+        self.hourplans = ['']
         self.yesterday_summary = ''
 
         self.status = 'idle'
