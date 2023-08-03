@@ -23,6 +23,7 @@ class Game:
         self.lookup_places(self.root)
         self.agents = self.make_agents()
         self.get_save_index()
+        self.last_player_intention = ""
 
     def lookup_places(self,node):
         for child in node.children: 
@@ -68,7 +69,8 @@ class Game:
                 with open(Path(path + 'game_info/to_server.json'), 'r') as file: 
                     front_data = json.load(file)
             
-            if front_data['player']['toAgent'] != "": self.generate_quest(front_data['player'])
+            if front_data['player']['agent']+front_data['player']['toAgent'] != self.last_player_intention: 
+                self.generate_quest(front_data['player'])
             #self.generate_quest({'agent':"Eve", 'toAgent':"I want to find treasure!"})
                 
             self.update_agent(agent)
@@ -164,7 +166,7 @@ class Game:
             choices = '\n'.join([choices,s])
         
         query = f'Given the place(s) above, write a JSON dictionary object with "choice": int. Choice should be one of the indices shown above.'
-        if quest: query = ' '.join([query,f'Make its value the index of the place which best fits the following quest description: {quest}'])
+        if quest: query = ' '.join([query,f'Make its value the index of the place which works best given the following information: {quest}'])
         else: query = ' '.join([query,f'Make its value the index of the place which is the most reasonable for {agent.name} to do the following activity: {agent.status}'])
         
         prompt = '\n'.join([choices, query])
@@ -176,7 +178,7 @@ class Game:
         
         if not 1 <= index <= len(root.children): return location
         location = root.children[index-1]
-        return self.choose_location(agent,location) if location.children else location
+        return self.choose_location(agent,location,quest) if location.children else location
         
 
     def conversation(self, agent, other_agent):
@@ -187,7 +189,7 @@ class Game:
         # TODO: could we set their destination to a halfway point between the agents?
         agent.conversation, other_agent.conversation = conversation, conversation
         agent.conversing_with, other_agent.conversing_with = other_agent.name, agent.name
-        agent.destination, other_agent.destination = None, None
+        #agent.destination, other_agent.destination = None, None
 
 
         conversation_description = self.create_conversation_description(conversation)
@@ -205,6 +207,7 @@ class Game:
     
 
     def generate_quest(self,player):
+        self.last_player_intention = player['agent']+player['toAgent']
         agent_coherence,use_intention = increment_test()
         agent = self.agents[0]
         for a in self.agents:
@@ -224,11 +227,17 @@ class Game:
             name = agent.name
             context += f'{name} is talking to the player, and remembers the following:\n'
             for m in memories: context += f'{m.description}\n'
+
+            location = self.choose_location(None,self.root,context)
             prompt = context + f'Generate a quest that {name} would know about or want done' + prompt
         else: 
             name = "an NPC"
-            if use_intention: prompt = f'An NPC is talking to the player, who has an interest in the following: {player["toAgent"]}\nGenerate a quest that the player would be interested in.\n'
-            else: prompt = f'Generate a quest for a player in a small village surrounded by a forest, a field, and a mountain.'
+            if use_intention: 
+                location = self.choose_location(None,self.root,f"The player has an interest in the following: {player['toAgent']}")
+                prompt = f'An NPC is talking to the player, who has an interest in the following: {player["toAgent"]}\nGenerate a quest that the player would be interested in.\n'
+            else: 
+                location = self.choose_location(None,self.root,f"There is a forest, a field, and a mountain near the village.")
+                prompt = f'Generate a quest for a player in a small village surrounded by a forest, a field, and a mountain.'
 
         prompt += f'Give your quest as a JSON dictionary object with three fields, "name": str, "type": int, and "description": str. "name" should be the quest name. "description" should be {name}\'s words describing the quest objective. "type" denotes the objective of the quest, and should be one of three numbers: 1 for grabbing an item, 2 for visiting a location, or 3 for fighting enemies.'
         expected_structure = {
@@ -239,7 +248,6 @@ class Game:
         quest = prompt_until_success(prompt, expected_structure)
         if not 1<=quest['type']<=3: quest['type'] = 0
         
-        location = self.choose_location(None,self.root,quest['description'])
         prompt = f'The following is a quest description: {quest["description"]}\nThe following is the location where this quest should be done: {location.name}\nGiven this quest location, give a revised quest description that mentions the quest location. Give your answer as a JSON dictionary object with one field, "description": str.'
         expected_structure = {
             "description": str
