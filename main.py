@@ -63,7 +63,7 @@ def send_server_info(data, game):
 def load_game(time_step):
     with open(Path(path + 'game_info/to_server.json'), 'r') as file:
         front_data = json.load(file)
-    index = front_data['load_file']
+    index = front_data['file_index']
     if index == -1:
         update_world_tree()
         game = Game(time_step=time_step)

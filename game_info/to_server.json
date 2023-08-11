@@ -1,1 +1,202 @@
-{"save":false,"load_file":-1,"agents":[{"name":"Frank","spawn_location":{"x":-994,"y":-4340,"z":595.79359397804024},"agents":[],"objects":["Frank_house"]},{"name":"Bob","spawn_location":{"x":-967,"y":-3499,"z":613.92427062988281},"agents":["Alice"],"objects":["A&B_house"]},{"name":"Alice","spawn_location":{"x":-870.75716645037573,"y":-3644.4381533761411,"z":627.37372361656696},"agents":["Bob","Claire","Eve","Hash","Doug","Irene","Frank"],"objects":["A&B_house","townSquare3","Claire&Doug_house","townsquare","Eve_house","Irene_house","townsquare2","Hash_house"]},{"name":"Claire","spawn_location":{"x":-2173.1531773351649,"y":-2710.5536798820572,"z":592.44439430367936},"agents":["Irene"],"objects":["Ginny_house"]},{"name":"Doug","spawn_location":{"x":-2103,"y":-2711,"z":603.99584579467773},"agents":["Bob","Joseph","Alice"],"objects":["A&B_house","Joseph_house","Claire&Doug_house"]},{"name":"Eve","spawn_location":{"x":-1827,"y":-4790,"z":623.1230411529541},"agents":["Frank"],"objects":["villageGate","Frank_livingRoom","Frank_house","Eve_house"]},{"name":"Ginny","spawn_location":{"x":-2929,"y":-3772,"z":618.22924423217773},"agents":["Bob","Eve","Joseph"],"objects":["townSquare3","townsquare2","townsquare","A&B_house","Joseph_house","Ginny_house","Eve_house"]},{"name":"Hash","spawn_location":{"x":-2435,"y":-4512,"z":607.95019912719727},"agents":["Bob","Eve","Frank","Alice"],"objects":["townsquare2","townsquare","A&B_house","Frank_house","Hash_house","Eve_house"]},{"name":"Irene","spawn_location":{"x":-2599,"y":-2854,"z":615.3159236907959},"agents":["Bob","Doug","Joseph","Claire","Alice"],"objects":["townSquare3","A&B_house","Joseph_house","Claire&Doug_house","Irene_house"]},{"name":"Joseph","spawn_location":{"x":-1402,"y":-2893,"z":608.32666778564453},"agents":["Alice"],"objects":["A&B_table","Joseph_house"]}],"player":{"player":"player","position":{"x":-1228,"y":-4274,"z":571.40000152587891},"inventory":[],"agent":"","toAgent":"","quests":[]}}
+{
+    "save": false,
+    "file_index": -1,
+    "agents": [
+        {
+            "name": "Frank",
+            "spawn_location": {
+                "x": -994,
+                "y": -4340,
+                "z": 595.79359397804024
+            },
+            "agents": [],
+            "objects": [
+                "Frank_house"
+            ]
+        },
+        {
+            "name": "Bob",
+            "spawn_location": {
+                "x": -967,
+                "y": -3499,
+                "z": 613.92427062988281
+            },
+            "agents": [
+                "Alice"
+            ],
+            "objects": [
+                "A&B_house"
+            ]
+        },
+        {
+            "name": "Alice",
+            "spawn_location": {
+                "x": -870.75716645037573,
+                "y": -3644.4381533761411,
+                "z": 627.37372361656696
+            },
+            "agents": [
+                "Bob",
+                "Claire",
+                "Eve",
+                "Hash",
+                "Doug",
+                "Irene",
+                "Frank"
+            ],
+            "objects": [
+                "A&B_house",
+                "townSquare3",
+                "Claire&Doug_house",
+                "townsquare",
+                "Eve_house",
+                "Irene_house",
+                "townsquare2",
+                "Hash_house"
+            ]
+        },
+        {
+            "name": "Claire",
+            "spawn_location": {
+                "x": -2173.1531773351649,
+                "y": -2710.5536798820572,
+                "z": 592.44439430367936
+            },
+            "agents": [
+                "Irene"
+            ],
+            "objects": [
+                "Ginny_house"
+            ]
+        },
+        {
+            "name": "Doug",
+            "spawn_location": {
+                "x": -2103,
+                "y": -2711,
+                "z": 603.99584579467773
+            },
+            "agents": [
+                "Bob",
+                "Joseph",
+                "Alice"
+            ],
+            "objects": [
+                "A&B_house",
+                "Joseph_house",
+                "Claire&Doug_house"
+            ]
+        },
+        {
+            "name": "Eve",
+            "spawn_location": {
+                "x": -1827,
+                "y": -4790,
+                "z": 623.1230411529541
+            },
+            "agents": [
+                "Frank"
+            ],
+            "objects": [
+                "villageGate",
+                "Frank_livingRoom",
+                "Frank_house",
+                "Eve_house"
+            ]
+        },
+        {
+            "name": "Ginny",
+            "spawn_location": {
+                "x": -2929,
+                "y": -3772,
+                "z": 618.22924423217773
+            },
+            "agents": [
+                "Bob",
+                "Eve",
+                "Joseph"
+            ],
+            "objects": [
+                "townSquare3",
+                "townsquare2",
+                "townsquare",
+                "A&B_house",
+                "Joseph_house",
+                "Ginny_house",
+                "Eve_house"
+            ]
+        },
+        {
+            "name": "Hash",
+            "spawn_location": {
+                "x": -2435,
+                "y": -4512,
+                "z": 607.95019912719727
+            },
+            "agents": [
+                "Bob",
+                "Eve",
+                "Frank",
+                "Alice"
+            ],
+            "objects": [
+                "townsquare2",
+                "townsquare",
+                "A&B_house",
+                "Frank_house",
+                "Hash_house",
+                "Eve_house"
+            ]
+        },
+        {
+            "name": "Irene",
+            "spawn_location": {
+                "x": -2599,
+                "y": -2854,
+                "z": 615.3159236907959
+            },
+            "agents": [
+                "Bob",
+                "Doug",
+                "Joseph",
+                "Claire",
+                "Alice"
+            ],
+            "objects": [
+                "townSquare3",
+                "A&B_house",
+                "Joseph_house",
+                "Claire&Doug_house",
+                "Irene_house"
+            ]
+        },
+        {
+            "name": "Joseph",
+            "spawn_location": {
+                "x": -1402,
+                "y": -2893,
+                "z": 608.32666778564453
+            },
+            "agents": [
+                "Alice"
+            ],
+            "objects": [
+                "A&B_table",
+                "Joseph_house"
+            ]
+        }
+    ],
+    "player": {
+        "player": "player",
+        "position": {
+            "x": -1228,
+            "y": -4274,
+            "z": 571.40000152587891
+        },
+        "inventory": [],
+        "agent": "",
+        "toAgent": "",
+        "quests": []
+    },
+    "kill": true
+}
