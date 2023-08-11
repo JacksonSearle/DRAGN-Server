@@ -198,5 +198,5 @@
         "toAgent": "",
         "quests": []
     },
-    "kill": true
+    "kill": false
 }
