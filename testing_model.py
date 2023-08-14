@@ -12,7 +12,7 @@ print()
 openai.api_key_path = (path + ".env")
 load_dotenv(path)
 # Maximum number of API calls per day
-MAX_API_CALLS = 1000
+MAX_API_CALLS = 10000
 
 
 def get_valid_response(prompt, keys, types):

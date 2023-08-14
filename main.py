@@ -77,7 +77,7 @@ def load_game(time_step):
     
 
 def main():
-    game_states = 5 # number of time steps
+    game_states = 20 # number of time steps
     time_step = 1800 # seconds
 
     game = load_game(time_step)

@@ -64,13 +64,14 @@ class Game:
         with open(Path(path + 'game_info/to_server.json'), 'r') as file: 
             front_data = json.load(file)
         for agent in self.agents:
-            with open(Path(path + 'game_info/to_server.json'), 'r') as file: 
+            with open(Path(path + 'game_info/to_server.json'), 'r') as file:
                 front_data = json.load(file)
                 if front_data["kill"]:
                     exit()
             while front_data['player']['agent'] and front_data['player']['toAgent'] == "":
                 time.sleep(.5)
-                with open(Path(path + 'game_info/to_server.json'), 'r') as file: 
+                with open(Path(path + 'game_info/to_server.json'), 'r') as file:  
+
                     front_data = json.load(file)
             
             if front_data['player']['agent']+front_data['player']['toAgent'] != self.last_player_intention: 

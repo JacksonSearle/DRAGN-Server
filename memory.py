@@ -21,7 +21,6 @@ class Memory:
             "importance": int,
         }
         dictionary = prompt_until_success(prompt, expected_structure)
-        print("GENERATING IMPORTANCE")
         number = dictionary["importance"]
 
         # Check out of bounds numbers
