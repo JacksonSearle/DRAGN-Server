@@ -95,4 +95,4 @@ def main():
     
     print('Done with simulation')
 
-main()
+# main()
