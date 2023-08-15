@@ -17,7 +17,7 @@ character_sheets = [
         'vision_radius': 2000,
         'waking_hours': {"up": 700, "down": 2300},
         'innate_traits':'friendly, charming, hospitable',
-        'seed_memories': ' enjoys going fishing; reads the news a lot; enjoys investing in stocks; is married to Alice; has lived in the town for a few years; wants to visit Hash'
+        'seed_memories': ' enjoys going fishing; reads the news a lot; enjoys climbing mountains; is married to Alice; has lived in the town for a few years; wants to visit Hash'
     },
     {
         'name': 'Alice',
