@@ -1,5 +1,4 @@
 from util import *
-from multiprocessing import Pool
 from pathlib import Path
 import json
 import pickle
@@ -23,7 +22,7 @@ class Game:
         self.lookup_places(self.root)
         self.agents = self.make_agents()
         self.get_save_index()
-        self.last_player_intention = ""
+        self.create_quest = False
 
     def lookup_places(self,node):
         for child in node.children: 
@@ -64,23 +63,17 @@ class Game:
         with open(Path(path + 'game_info/to_server.json'), 'r') as file: 
             front_data = json.load(file)
         for agent in self.agents:
-            with open(Path(path + 'game_info/to_server.json'), 'r') as file:
-                front_data = json.load(file)
-                if front_data["kill"]:
-                    exit()
-            while front_data['player']['agent'] and front_data['player']['toAgent'] == "":
+            while front_data['player']['agent'] and not front_data['player']['hasSpoken']:
+                self.create_quest = False
                 time.sleep(.5)
-                with open(Path(path + 'game_info/to_server.json'), 'r') as file:  
-
+                with open(Path(path + 'game_info/to_server.json'), 'r') as file: 
                     front_data = json.load(file)
             
-            if front_data['player']['agent']+front_data['player']['toAgent'] != self.last_player_intention: 
+            if front_data['player']['agent'] and front_data['player']['hasSpoken'] and not self.create_quest: 
                 self.generate_quest(front_data['player'])
-            #self.generate_quest({'agent':"Eve", 'toAgent':"I want to find treasure!"})
+                self.create_quest = True
                 
             self.update_agent(agent)
-        # with Pool(processes=10) as pool:
-        #     pool.map(self.update_agent, self.agents)
 
         self.time = increase_time(self.time, self.time_step)
         
@@ -130,7 +123,7 @@ class Game:
             if other_agent.name in agent.observed_agents:
                 # Make both agents see each other
                 #TODO: prompts do not consistently produce statuses that fit with this sentence structure, e.g "Bob is check on Alice", "Alice is Alice would chat"
-                description = f'{other_agent.name}\'s plan is to {other_agent.status}'
+                description = f'{other_agent.name}\'s plan: {other_agent.status}'
                 memory = Memory(self.time, description)
                 agent.add_memory(memory)
                 
@@ -139,10 +132,10 @@ class Game:
                 if react>=0:
                     agent.status = interact
                     # make a memory for the person they are talking to
-                    description = agent.status
+                    description = f"Saw {agent.name} with the following status: {agent.status}"
                     memory = Memory(self.time, description)
                     other_agent.add_memory(memory)
-                    other_agent.status = description
+                    other_agent.status = f"Talking to {agent.name}"
                     # generate dialogue
                     self.conversation(agent, other_agent)
 
