@@ -32,8 +32,7 @@ class Agent:
         self.conversation = None
         self.conversing_with = None
 
-        self.summary_description = None
-        self.update_summary_description(time)
+        self.summary_description = f'{self.name} is {self.age}, and is {self.innate_traits}. {self.name}\'s character includes the following:{self.seed_memories}'
         self.reflect_buffer = 0
         self.summary_description_buffer = 0
 
@@ -215,7 +214,7 @@ class Agent:
         relevant_context += "Relevant Context:\n"
         relevant_context += '\n'.join([m.description for rel in relevant for m in rel])
 
-        question = f'Based on the context above, give a json dictionary object with "choice": int, "interact": string, and "duration": int. Choice should be one of the indices shown above, or -1. Make its value the index of the observation which {self.name} should react to (or -1 for no reaction). The interact string will describe how {self.name} interacts to the chosen observation. The duration int shows how long {self.name} interacts with that object. Duration should be in minutes, somewhere between 5 and 15 minutes.'
+        question = f'Based on the context above, give a json dictionary object with "choice": int, "interact": string, and "duration": int. Choice should be one of the indices shown above, or -1. Make its value the index of the observation which {self.name} should react to (or -1 for no reaction). The interact string will describe (in 5 words or less) how {self.name} interacts to the chosen observation. The duration int shows how long {self.name} interacts with that object. Duration should be in minutes, somewhere between 5 and 15 minutes.'
         prompt = '\n'.join([self.summary_description, time_prompt(current_time), self.format_status(), relevant_context, question])
         expected_structure = {
             "choice": int,
@@ -227,7 +226,7 @@ class Agent:
         
         self.status = dictionary['interact']
         self.busy_time = dictionary['duration'] * 60
-        return dictionary['choice']-1, dictionary['interact']
+        return dictionary['choice']-1
     
     def converse(self, other_agent, current_time):
         recent_memory = self.memory_stream[-1]
