@@ -82,6 +82,8 @@ class Game:
         timeofday = get_timeofday(self.time)
         if timeofday == agent.waking_hours["up"]: 
             agent.plan_day(self.time)
+            agent.plan_hour(self.time)
+            agent.plan_next(self.time)
             self.execute_plan(agent)
         #Call reflection if agent is going to bed, or call hour/minute plans if during waking hours
         elif timeofday == agent.waking_hours["down"]: agent.end_day(self.time)
@@ -92,7 +94,7 @@ class Game:
                 agent.conversation = None
                 agent.conversing_with = None
                 if timeofday%100 == 0: agent.plan_hour(self.time)
-                else: agent.plan_next(self.time)
+                agent.plan_next(self.time)
                 self.execute_plan(agent)
             else: agent.busy_time -= self.time_step
 
@@ -111,9 +113,8 @@ class Game:
                 choices.append(self.places[place])
         # Choose whether or not to react to each observation
         if agent.conversation == None and len(perceived) > 0:
-            react, interact = agent.react(self.time, perceived)
+            react = agent.react(self.time, perceived)
             if react>=0: 
-                agent.status = interact
                 self.execute_plan(agent, choices[min(react, len(choices)-1)])
                 return True
         return False
@@ -128,9 +129,8 @@ class Game:
                 agent.add_memory(memory)
                 
                 # Choose whether or not to react to each observation
-                react, interact = agent.react(self.time, [memory])
+                react = agent.react(self.time, [memory])
                 if react>=0:
-                    agent.status = interact
                     # make a memory for the person they are talking to
                     description = f"Saw {agent.name} with the following status: {agent.status}"
                     memory = Memory(self.time, description)
@@ -144,12 +144,12 @@ class Game:
         if agent.destination: agent.destination.state = "idle"
         if destination: agent.destination = destination
         else: agent.destination = self.choose_location(agent) 
-        prompt = f'{agent.name} is {agent.status} at the {agent.destination.name}. Generate a JSON dictionary object with a single field, "status": string, which describes the status the {agent.destination.name} is in.'
+        prompt = f'{agent.name} is {agent.status} at the {agent.destination.name}. Generate a JSON dictionary object with a single field, "state": string, which describes the state the {agent.destination.name} is in.'
         expected_structure = {
-            "status": str
+            "state": str
         }
         dictionary = prompt_until_success(prompt, expected_structure)
-        agent.destination.state = dictionary['status']
+        agent.destination.state = dictionary['state']
     
     def choose_location(self,agent,root=None,quest=None):
         if root: location = root
