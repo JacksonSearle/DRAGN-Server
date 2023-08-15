@@ -235,7 +235,7 @@ class Agent:
         other_memories = other_agent.retrieve_memories(current_time, other_agent.memory_stream[-1].description)
         relevant_memories = f'{self.name} remembers the following: {[memory.description for memory in relevant_memories]}'
         other_memories = f'{other_agent.name} remembers the following: {[m.description for m in other_memories]}'
-        question = f'What should {self.name} and {other_agent.name} say to each other? Give your response as a JSON object with one field, conversation: str.'
+        question = f'What should {self.name} and {other_agent.name} say to each other? Keep the conversation casual and not overly formal or polite. Give your response as a JSON object with one field, conversation: str.'
         prompt = '\n'.join([
             self.summary_description,
             time_prompt(current_time),
