@@ -63,6 +63,11 @@ class Game:
         with open(Path(path + 'game_info/to_server.json'), 'r') as file: 
             front_data = json.load(file)
         for agent in self.agents:
+            # Check for save
+            if front_data['save'] == True and front_data['file_index'] != -1:
+                self.save(front_data['file_index'])
+
+            # Check for quests and conversation
             while front_data['player']['agent'] and not front_data['player']['hasSpoken']:
                 self.create_quest = False
                 time.sleep(.5)
@@ -266,11 +271,7 @@ class Game:
         with open(Path(path + 'game_info/to_client.json'), 'w') as file:
             json.dump(data, file)
 
-
-    def get_save_index(self):
-        self.save_index = get_index()
-
-    def save(self):
-        pickle_file_name = path + f'saved_games/save_state_{self.save_index}.pkl'
+    def save(self, save_index):
+        pickle_file_name = path + f'saved_games/save_state_{save_index}.pkl'
         with open(pickle_file_name, 'wb') as file:
             pickle.dump(self, file)
