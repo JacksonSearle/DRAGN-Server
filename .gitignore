@@ -9,4 +9,5 @@ __pycache__/
 .env
 .vscode
 *.pkl
+*.pyc
 config.py
