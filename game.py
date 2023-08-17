@@ -149,12 +149,12 @@ class Game:
         if agent.destination: agent.destination.state = "idle"
         if destination: agent.destination = destination
         else: agent.destination = self.choose_location(agent) 
-        prompt = f'{agent.name} is {agent.status} at the {agent.destination.name}. Generate a JSON dictionary object with a single field, "state": string, which describes the state the {agent.destination.name} is in.'
+        prompt = f'{agent.name} is {agent.status} at the {agent.destination.name}. Generate a JSON dictionary object with a single field, "status": string, which describes the status the {agent.destination.name} is in.'
         expected_structure = {
-            "state": str
+            "status": str
         }
         dictionary = prompt_until_success(prompt, expected_structure)
-        agent.destination.state = dictionary['state']
+        agent.destination.state = dictionary['status']
     
     def choose_location(self,agent,root=None,quest=None):
         if root: location = root
